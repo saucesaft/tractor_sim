@@ -1,6 +1,6 @@
 # buenasss
 
 ### todo
--[ ] botones
--[ ] lcd
--[ ] serial
+- [ ] botones
+- [ ] lcd
+- [ ] serial
