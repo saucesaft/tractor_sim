@@ -16,6 +16,7 @@ int main(void)
   	USER_RCC_Init();
 	USER_GPIO_Init();
   	USER_USART1_Init();
+	USER_TIM2_Init();
 	USER_ADC1_Init();
 	EngTrModel_initialize();
 	
@@ -60,6 +61,9 @@ int main(void)
 		printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		printf("Gear: %f\r\n", EngTrModel_Y.Gear);
 		USER_TIM3_Delay();//  200ms
+		
+		USER_TIM2_Reset();
+		USER_TIM2_Start();
 	}
 }
 
