@@ -5,8 +5,16 @@
 
 int _write(int file, char *ptr, int len);
 
+
+// USARTDIV 34.722222222
+// Fraction: 0.722222222 * 16 = 11.555555556 ~= 12
+// Mantissa: 34
+
+// [frac] [mantissa]
+// 0x[22] [C]
+
 // config registers
-#define USARTDIV        0x45				// 115200 baud rate
+#define USARTDIV        0x22C				// 115200 baud rate
 #define USART_CR1_UE    ( 0x1UL << 13U ) 	// enable usart peripheral
 #define USART_CR1_M     ( 0x1UL << 12U )	// word length 8 bits
 #define USART_CR1_TE    ( 0x1UL <<  3U ) 	// enable transmitter

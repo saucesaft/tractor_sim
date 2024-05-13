@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "main.h"
+#include "tim.h"
 #include "lcd.h"
 
 //Caracter definido por usuario para cargar en la memoria CGRAM del LCD
@@ -48,21 +49,21 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D5_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
-	USER_TIM_Delay();//	50ms
+	USER_TIM4_Delay();//	50ms
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
-	USER_TIM_Delay();//	5ms
+	USER_TIM5_Delay();//	5ms
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
-	USER_TIM_Delay();//	100us
+	USER_TIM9_Delay();//	100us
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -191,7 +192,7 @@ char LCD_Busy(void){
 	GPIOC->BSRR	 =	 LCD_RS_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_RW_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_EN_PIN_HIGH;
-	USER_TIM_Delay();//	100us
+	USER_TIM9_Delay();//	100us
 	if(( GPIOC->IDR	& LCD_D7_PIN_HIGH )) {//			if D7 is set, then
 		GPIOC->BSRR	= 	LCD_EN_PIN_LOW;
 		GPIOC->BSRR	=	LCD_RW_PIN_LOW;
@@ -216,11 +217,11 @@ char LCD_Busy(void){
 //Funcion que genera un pulso en el pin EN del LCD
 void LCD_Pulse_EN(void){
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//
-	USER_TIM_Delay();//	10us
+	USER_TIM10_Delay();//	10us
 	GPIOC->BSRR	=	LCD_EN_PIN_HIGH;//			habilita pin EN ON
-	USER_TIM_Delay();//	10us
+	USER_TIM10_Delay();//	10us
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//			habilita pin EN OFF
-	USER_TIM_Delay();//	1ms
+	USER_TIM11_Delay();//	1ms
 }
 
 /*

@@ -125,11 +125,20 @@ typedef struct {
 #define RCC_BASE	0x40021000UL	//	RCC base address
 #define GPIOA_BASE	0x40010800UL	//	GPIO Port A base address
 #define GPIOB_BASE  0x40010C00UL	//  GPIO Port B base address
-#define GPIOC_BASE	0x40011000UL	//	GPIO Port A base address
+#define GPIOC_BASE	0x40011000UL	//	GPIO Port C base address
 #define USART_BASE	0x40013800UL	//  USART1 base address
 #define FLASH_BASE  0x40022000UL    // FLASH base address
+
 #define TIM2_BASE	0x40000000UL 	//  TIM2 base address
 #define TIM3_BASE	0x40000400UL 	//  TIM3 base address
+
+#define TIM4_BASE	0x40000800UL 	//  TIM4 base address
+#define TIM5_BASE	0x40000C00UL 	//  TIM5 base address
+
+#define TIM9_BASE	0x40014C00UL 	//  TIM9 base address
+#define TIM10_BASE	0x40015000UL 	//  TIM10 base address
+#define TIM11_BASE	0x40015400UL 	//  TIM11 base address
+
 #define NVIC_BASE	0xE000E100UL	//	NVIC base address
 #define ADC1_BASE	0x40012400UL	// ADC1 base address
 
@@ -141,6 +150,11 @@ typedef struct {
 #define FLASH		(( FLASH_TypeDef 	*)	FLASH_BASE	)
 #define TIM2		(( TIM_TypeDef		*)	TIM2_BASE 	)
 #define TIM3		(( TIM_TypeDef		*)	TIM3_BASE 	)
+#define TIM4		(( TIM_TypeDef		*)	TIM4_BASE 	)
+#define TIM5		(( TIM_TypeDef		*)	TIM5_BASE 	)
+#define TIM9		(( TIM_TypeDef		*)	TIM9_BASE 	)
+#define TIM10		(( TIM_TypeDef		*)	TIM10_BASE 	)
+#define TIM11		(( TIM_TypeDef		*)	TIM11_BASE 	)
 #define NVIC		(( NVIC_TypeDef		*)	NVIC_BASE	)
 #define ADC1		(( ADC_TypeDef		*)	ADC1_BASE	)
 
@@ -148,5 +162,7 @@ typedef struct {
 #define ROW2_PIN ( GPIOB->IDR & ( 0x1UL << 5U )) // Right movement 'B' | Pin PB_5
 #define ROW3_PIN ( GPIOB->IDR & ( 0x1UL << 3U )) // Left movement 'C' | Pin PB_3
 #define COL4_PIN ( GPIOA->IDR & ( 0x1UL << 10U )) // Column number of previous 3 rows | Pin PA_10
+
+#define POT_PIN ( GPIOA->IDR & ( 0x1UL << 0U )) // Potenciometer pin | PA0
 
 #endif /* MAIN_H_ */

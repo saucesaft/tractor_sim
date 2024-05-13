@@ -13,7 +13,7 @@ void USER_ADC1_Init( void ) {
 
     // Configure sequence and/or number of conversions for ADC regular channels
     ADC1->SQR1 |= ADC1_SQR1_L; // 1 conversion for regular channels
-    ADC1->SQR3 |= ADC1_SQR3_SQ1; // Channel for the first ADC conversion | PAO
+    ADC1->SQR3 |= ADC1_SQR3_SQ1; // Channel for the first ADC conversion | PA0
     // Since we will read from PA0, we don't need to include a POT_ADC_PIN in main.c
 
     // Enable ADC module
@@ -29,7 +29,7 @@ uint16_t USER_ADC1_Read( void ) {
     ADC1->CR2 |= ADC1_CR2_ADON;
 
     // Wait for conversion to complete
-    while (!(ADC->SR & ( 0x1UL << 1U ))); // Wait until EOC (End of Conversion Flag) is set
+    while (!(ADC1->SR & ( 0x1UL << 1U ))); // Wait until EOC (End of Conversion Flag) is set
 
     // Read the converted value
     return ADC1->DR;
