@@ -1,13 +1,14 @@
 <div align="center">
 
 # Tractor Simulator
-<img src=logodeere.png style="width:25%; height:25%;">
 
-##### Simulate a tractor (pending better description)
+##### Tractor gearbox simulation
 
-![Static Badge](https://img.shields.io/badge/Nucleo_F103RB-blue?logo=stmicroelectronics)
-![Static Badge](https://img.shields.io/badge/PI_4-red?logo=raspberrypi)
+![Static Badge](https://img.shields.io/badge/Nucleo_F103RB-blue?style=for-the-badge&logo=stmicroelectronics)
+![Static Badge](https://img.shields.io/badge/PI_4-red?style=for-the-badge&logo=raspberrypi)
 ![Static Badge](https://img.shields.io/badge/Assembly-gray?style=for-the-badge&logo=Assembly)
+![Static Badge](https://img.shields.io/badge/Python-green?style=for-the-badge&logo=python&logoColor=white)
+![Static Badge](https://img.shields.io/badge/C_language-black?style=for-the-badge&logo=c&logoColor=white)
 
 </div>
 
