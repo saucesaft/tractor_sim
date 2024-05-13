@@ -259,3 +259,12 @@ void LCD_BarGraphicXY(int16_t pos_x, int16_t pos_y, int16_t value){
 		}
 	}
 }
+
+void USER_LCD_Send_Message( uint8_t *msg, uint16_t size ){
+	LCD_Put_Str("Vehicle Speed: ");
+	LCD_Put_Num( msg[4] );
+	LCD_Put_Str("Engine Speed: ");
+	LCD_Put_Num( msg[2] );
+	LCD_Put_Str("Gear: ");
+	LCD_Put_Num( msg[6] );
+}

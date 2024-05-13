@@ -44,7 +44,7 @@ int _write(int file, char *ptr, int len);
 // this bit is set by hardware when a parity error occurs in receiver mode
 
 void USER_USART1_Init( void );
-void USER_USART1_Transmit( uint8_t *pData, uint16_t size );
 uint8_t USER_USART1_Read_8bit();
+void USER_UART_Send_Message( uint8_t *msg, uint16_t size);
 
 #endif /* UART_H_ */

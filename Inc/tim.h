@@ -1,6 +1,17 @@
 #ifndef TIM_H_
 #define TIM_H_
 
+///////////////
+// msg state //
+///////////////
+
+// 0xff marks the start of a new message
+// 0x80 signals velocity of the motor
+// 0x40 signals speed of the vehicle
+// 0x20 signals the gear
+static uint8_t msg[6] = {0xff, 0x80, 0x00, 0x40, 0x00, 0x20, 0x00};
+static int msg_length = sizeof(msg) / sizeof(msg[0]);
+
 // config registers -> 10 ms
 #define TIM2_PSC	9UL
 #define TIM2_CNT	1536UL
@@ -73,6 +84,12 @@ void USER_TIM2_Delay( void );
 // update interrupt flag
 #define TIM3_SR_UIF		( 0x1UL << 0U )
 
+// overflow interrupt enable
+#define TIM3_DIER_UIE  ( 0x1UL << 0U )
+
+// move interrupt to peripheral
+#define NVIC_ISER_TIM3 ( 0x1UL << 29U )
+
 void USER_TIM3_Init( void );
 
 void USER_TIM3_Reset( void );
@@ -80,6 +97,8 @@ void USER_TIM3_Reset( void );
 void USER_TIM3_Start( void );
 
 void USER_TIM3_Delay( void );
+
+void TIM3_IRQHandler( void );
 
 // enable internal clock source
 #define TIM4_SMCR_SMS   ( 0x7UL << 0U )

@@ -24,21 +24,21 @@ int main(void)
 	USER_TIM9_Init();
 	USER_TIM10_Init();
 	USER_TIM11_Init();
-	USER_ADC1_Init();
+
 	LCD_Init();
+
+	USER_ADC1_Init();
 	EngTrModel_initialize();
-	
-	// 0xff marks the start of a new message
-	// 0x80 signals velocity of the motor
-	// 0x40 signals speed of the vehicle
-	// 0x20 signals the gear
-	uint8_t msg[6] = {0xff, 0x80, 0x00, 0x40, 0x00, 0x20, 0x00};
-	int msg_length = sizeof(msg) / sizeof(msg[0]);
+
+	// ROW 1 - 'A' | Right movement (not used for now)
+	// ROW 2 - 'B' | Brake
+	// ROW 3 - 'C' | Left movement (not used for now)
 
   for(;;)
-	{	
-		LCD_Clear();
-		LCD_Set_Cursor( 1, 1);
+	{
+
+		GPIOA->ODR ^= ( 0x1UL << 5U );
+		USER_TIM4_Delay();
 
 		// Reads the value from the potentiometer
 		uint16_t pot_value = USER_ADC1_Read();
@@ -46,30 +46,16 @@ int main(void)
 		// Scales the potentiometer value to the range of acceleration (0 to 100)
 		float acceleration = map(pot_value, 0, 4095, 0, 100);
 
-		// Checks for any key presses in column 4
-		// PA10 is input pull up - normally 1. When pressed, it is 0
-		// if (!COL4_PIN) {
-			// Debounce and checks which key is pressed
+		// Key 'B' is pressed and executes brake
+		if ( !(ROW2_PIN) ) {
+			
 			USER_TIM2_Delay(); // 10ms delay for debounce
-			// if (!COL4_PIN) { // If the key is still pressed after debounce
-				if (!ROW1_PIN) {
-					// Key 'A' is pressed and executes right movement
-					EngTrModel_U.Throttle = acceleration;
-					EngTrModel_U.BrakeTorque = 0.0;
-				}
-				else if (!ROW2_PIN) {
-					// Key 'B' is pressed and executes brake
-					EngTrModel_U.Throttle = 0.0;
-					EngTrModel_U.BrakeTorque = 100.0;
-				}
-				else if (!ROW3_PIN) {
-					// Key 'C' is pressed and executes left movement
-					EngTrModel_U.Throttle = acceleration;
-					EngTrModel_U.BrakeTorque = 0.0;
-				}
-			// }
-		// }
-		else {
+
+			if ( !(ROW2_PIN) ) {
+				EngTrModel_U.Throttle = 0.0;
+				EngTrModel_U.BrakeTorque = 100.0;
+			}
+		} else {
 			EngTrModel_U.Throttle = acceleration;
 			EngTrModel_U.BrakeTorque = 0.0;
 		}
@@ -77,7 +63,7 @@ int main(void)
 		// calculate the model output values
 		EngTrModel_step();
 
-		// set the values in the msg
+		// set the values in the msgs
 		msg[2] = (uint8_t) EngTrModel_Y.EngineSpeed;
 		msg[4] = (uint8_t) EngTrModel_Y.VehicleSpeed;
 		msg[6] = (uint8_t) EngTrModel_Y.Gear;
@@ -85,28 +71,6 @@ int main(void)
 		// printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
 		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
-
-		///////////////////////
-		// UART transmission //
-		///////////////////////
-
-		for (int i = 0; i < msg_length; i++) {
-			USER_USART1_Send_8bit( msg[i] );
-		}
-
-		/////////////////
-		// LCD display //
-		/////////////////
-
-		LCD_Put_Str("Vehicle Speed: ");
-		LCD_Put_Num(EngTrModel_Y.VehicleSpeed);
-		LCD_Put_Str("Engine Speed: ");
-		LCD_Put_Num(EngTrModel_Y.EngineSpeed);
-		LCD_Put_Str("Gear: ");
-		LCD_Put_Num(EngTrModel_Y.Gear);
-
-		USER_TIM3_Delay();//  200ms
-
 	}
 }
 
@@ -131,14 +95,30 @@ void USER_RCC_Init(void){
 	RCC->CFGR	|=	 ( 0x3UL << 14U ); // PCLK2 divided by 8. PCLK2 is 64MHz and ADC clock is for 8 MHz
 	// Clock for the ADC peripheral is configured. Must not exceed 14 MHz
 
-	RCC->APB2ENR |= ( 0x1UL << 2U ) // IO Port A clock enable
-	| ( 0x1UL << 14U ) // USART 1 clock enable
-	| ( 0x1UL << 3U ) // IO Port B clock enable
-	| ( 0x1UL << 4U ) // IO Port C clock enable
-	| ( 0x1UL << 9U ); // Configured ADC1 clock is enabled
+	RCC->APB1ENR	|=	( 0x1UL << 0U ) // TIM2 clock enable
+					| ( 0x1UL << 1U ) 	// TIM3 clock enable
+					| ( 0x1UL << 2U ) 	// TIM4 clock enable
+					| ( 0x1UL << 3U );	// TIM5 clock enable
+
+	RCC->APB2ENR 	|= ( 0x1UL << 2U ) // IO Port A clock enable
+					| ( 0x1UL << 14U ) // USART 1 clock enable
+					| ( 0x1UL << 3U ) // IO Port B clock enable
+					| ( 0x1UL << 4U ) // IO Port C clock enable
+					| ( 0x1UL << 9U ) // Configured ADC1 clock is enabled
+					| ( 0x1UL << 19U ) // TIM9 clock enable
+					| ( 0x1UL << 20U ) // TIM10 clock enable
+					| ( 0x1UL << 21U ); // TIM11 clock enable
 }
 
 void USER_GPIO_Init(void){
+
+	// TEST LED
+	// clear bits to remove trash values
+	GPIOA->CRL 	&= 	~( 0x3UL << 22U )
+				& 	~( 0x2UL << 20U );
+
+	// set bits to configure
+	GPIOA->CRL	|= ( 0x1UL << 20U ); // output, 10mhz
 
 	// 4x4 Keypad GPIOs
 

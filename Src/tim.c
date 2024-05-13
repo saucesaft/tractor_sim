@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "main.h"
 #include "tim.h"
+#include "lcd.h"
+#include "uart.h"
 
 /////////////
 // TIMER 2 //
@@ -47,6 +49,8 @@ void USER_TIM3_Init( void ){
 	TIM3->CR1 &= ~(TIM3_CR1_EA); 		// Set edge-aligned mode
 	TIM3->CR1 &= ~(TIM3_CR1_UC); 		// Set up-counter mode
 	TIM3->CR1 &= ~(TIM3_CR1_UEV); 		// Set UEV enabled
+	TIM3->DIER |= TIM3_DIER_UIE;		// Enable the update interrupt
+	NVIC->ISER[0] |= NVIC_ISER_TIM3;	// Enable the TIM3 interrupt
 
 	USER_TIM3_Reset(); // Executes reset function
 
@@ -67,9 +71,24 @@ void USER_TIM3_Start( void ){
 
 // Wait until the timer overflows and stop the timer
 void USER_TIM3_Delay( void ){
-	while(!( TIM2->SR & TIM3_SR_UIF ));
+	while(!( TIM3->SR & TIM3_SR_UIF ));
 
 	TIM3->CR1 &= ~(TIM3_CR1_CEN);		// Stop the timer
+}
+
+void TIM3_IRQHandler( void ){
+	if ( TIM3->SR & TIM3_SR_UIF ){
+		// LCD_Clear();
+		// LCD_Set_Cursor(1, 1);
+
+		GPIOA->ODR ^= ( 0x1UL << 5U );
+
+		// USER_UART_Send_Message(msg, msg_length);		// Send the message
+
+		// USER_LCD_Send_Message(msg, msg_length);			// Show the message
+
+		USER_TIM3_Reset();								// Reset the timer
+	}
 }
 
 /////////////

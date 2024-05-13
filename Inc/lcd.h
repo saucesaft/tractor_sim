@@ -47,4 +47,6 @@ void LCD_Pulse_EN(void);
 void LCD_BarGraphic(int16_t value, int16_t size);
 void LCD_BarGraphicXY(int16_t pos_x, int16_t pos_y, int16_t value);
 
+void USER_LCD_Send_Message( uint8_t *msg, uint16_t size );
+
 #endif /* INC_LCD_H_ */

@@ -9,7 +9,7 @@ void USER_ADC1_Init( void ) {
     ADC1->CR2 |= ADC1_CR2_CONT; // Continuous conversion mode
 
     // Configure sample time for ADC channel 0
-    ADC1->SMPR2 |= ADC1_SMPR2_SMP0
+    ADC1->SMPR2 &= ~(ADC1_SMPR2_SMP0);
 
     // Configure sequence and/or number of conversions for ADC regular channels
     ADC1->SQR1 |= ADC1_SQR1_L; // 1 conversion for regular channels

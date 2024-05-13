@@ -13,7 +13,7 @@
 #define ADC1_CR2_CONT     ( 0x1UL << 1U )
 
 // sample time for ADC channel (below is for 1.5 cycles)
-#define ADC1_SMPR2_SMP0    ( 0x0UL << 0U )
+#define ADC1_SMPR2_SMP0    ( 0x0UL << 1U )
 
 // sequence and/or number of conversions for ADC regular channels
 // 1 conversion for regular channels
