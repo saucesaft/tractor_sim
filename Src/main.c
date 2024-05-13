@@ -60,10 +60,8 @@ int main(void)
 		printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
 		printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		printf("Gear: %f\r\n", EngTrModel_Y.Gear);
-		USER_TIM3_Delay();//  200ms
-		
-		USER_TIM2_Reset();
-		USER_TIM2_Start();
+		USER_TIM2_Delay();//  200ms
+
 	}
 }
 
