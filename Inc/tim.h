@@ -24,21 +24,9 @@ static int msg_length = sizeof(msg) / sizeof(msg[0]);
 #define TIM4_PSC	48UL
 #define TIM4_CNT    230UL
 
-// config registers -> 5 ms
-#define TIM5_PSC	4UL
-#define TIM5_CNT    1536UL
-
-// config registers -> 100 us
-#define TIM9_PSC	0UL
-#define TIM9_CNT    59136UL
-
 // config registers -> 10 us
-#define TIM10_PSC	0UL
-#define TIM10_CNT   64896UL
-
-// config registers -> 1 ms
-#define TIM11_PSC	0UL
-#define TIM11_CNT   1536UL
+#define TIM5_PSC	0UL
+#define TIM5_CNT    64896UL
 
 // enable internal clock source
 #define TIM2_SMCR_SMS   ( 0x7UL << 0U )
@@ -151,59 +139,5 @@ void USER_TIM5_Reset( void );
 void USER_TIM5_Start( void );
 
 void USER_TIM5_Delay( void );
-
-// enable internal clock source
-#define TIM9_SMCR_SMS   ( 0x7UL << 0U )
-
-// uev enabled
-#define TIM9_CR1_UEV    ( 0x1UL << 1U )
-
-// enable the timer
-#define TIM9_CR1_CEN	( 0x1UL << 0U )
-
-// update interrupt flag
-#define TIM9_SR_UIF		( 0x1UL << 0U )
-
-void USER_TIM9_Init( void );
-
-void USER_TIM9_Reset( void );
-
-void USER_TIM9_Start( void );
-
-void USER_TIM9_Delay( void );
-
-// uev enabled
-#define TIM10_CR1_UEV    ( 0x1UL << 1U )
-
-// enable the timer
-#define TIM10_CR1_CEN	( 0x1UL << 0U )
-
-// update interrupt flag
-#define TIM10_SR_UIF		( 0x1UL << 0U )
-
-void USER_TIM10_Init( void );
-
-void USER_TIM10_Reset( void );
-
-void USER_TIM10_Start( void );
-
-void USER_TIM10_Delay( void );
-
-// uev enabled
-#define TIM11_CR1_UEV    ( 0x1UL << 1U )
-
-// enable the timer
-#define TIM11_CR1_CEN	( 0x1UL << 0U )
-
-// update interrupt flag
-#define TIM11_SR_UIF		( 0x1UL << 0U )
-
-void USER_TIM11_Init( void );
-
-void USER_TIM11_Reset( void );
-
-void USER_TIM11_Start( void );
-
-void USER_TIM11_Delay( void );
 
 #endif /* TIM_H_ */

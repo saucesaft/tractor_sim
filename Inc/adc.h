@@ -23,10 +23,13 @@
 #define ADC1_SQR3_SQ1   ( 0x0UL << 0U )
 
 // ADC module enable
-#define ADC1_CR2_ADON   ( 0x0UL << 0U )
+#define ADC1_CR2_ADON   ( 0x1UL << 0U )
 
 // ADC module calibration start | the same hardware resets the bit after calibration is complete
 #define ADC1_CR2_CAL    ( 0x1UL << 2U )
+
+// End of conversion bit
+#define ADC1_SR_EOC	( 1U )
 
 void USER_ADC1_Init( void );
 uint16_t USER_ADC1_Read ( void );

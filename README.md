@@ -22,11 +22,11 @@ Desarrollar código en C que permita transmitir mediante el UART los valores de 
 - [X] Timers
     - TIM2 10ms
     - TIM3 200ms
-    - TIM4 50ms
-    - TIM5 5ms
-    - TIM9 100us
-    - TIM10 10us
-    - TIM11 1ms
+    - TIM4 50ms 100us 1ms
+    - TIM5 5ms 10us
+    <!-- - TIM9 100us -->
+    <!-- - TIM10 10us -->
+    <!-- - TIM11 1ms -->
 - [X] Outputs
     - [X] LCD
     - [X] UART

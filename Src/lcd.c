@@ -56,14 +56,15 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
-	USER_TIM5_Delay();//	5ms
+	USER_TIM4_Delay();//	Wait for more than 5ms (50ms)
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
-	USER_TIM9_Delay();//	100us
+
+	USER_TIM4_Delay();//	Wait for more than 5ms (50ms)
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -192,7 +193,7 @@ char LCD_Busy(void){
 	GPIOC->BSRR	 =	 LCD_RS_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_RW_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_EN_PIN_HIGH;
-	USER_TIM9_Delay();//	100us
+	USER_TIM4_Delay();//	100us (50ms)
 	if(( GPIOC->IDR	& LCD_D7_PIN_HIGH )) {//			if D7 is set, then
 		GPIOC->BSRR	= 	LCD_EN_PIN_LOW;
 		GPIOC->BSRR	=	LCD_RW_PIN_LOW;
@@ -217,11 +218,11 @@ char LCD_Busy(void){
 //Funcion que genera un pulso en el pin EN del LCD
 void LCD_Pulse_EN(void){
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//
-	USER_TIM10_Delay();//	10us
+	USER_TIM5_Delay();//	10us
 	GPIOC->BSRR	=	LCD_EN_PIN_HIGH;//			habilita pin EN ON
-	USER_TIM10_Delay();//	10us
+	USER_TIM5_Delay();//	10us
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//			habilita pin EN OFF
-	USER_TIM11_Delay();//	1ms
+	// USER_TIM11_Delay();//	1ms
 }
 
 /*

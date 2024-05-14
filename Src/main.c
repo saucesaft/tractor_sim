@@ -21,9 +21,6 @@ int main(void)
 	USER_TIM3_Init();
 	USER_TIM4_Init();
 	USER_TIM5_Init();
-	USER_TIM9_Init();
-	USER_TIM10_Init();
-	USER_TIM11_Init();
 
 	LCD_Init();
 
@@ -104,10 +101,7 @@ void USER_RCC_Init(void){
 					| ( 0x1UL << 14U ) // USART 1 clock enable
 					| ( 0x1UL << 3U ) // IO Port B clock enable
 					| ( 0x1UL << 4U ) // IO Port C clock enable
-					| ( 0x1UL << 9U ) // Configured ADC1 clock is enabled
-					| ( 0x1UL << 19U ) // TIM9 clock enable
-					| ( 0x1UL << 20U ) // TIM10 clock enable
-					| ( 0x1UL << 21U ); // TIM11 clock enable
+					| ( 0x1UL << 9U ); // Configured ADC1 clock is enabled
 }
 
 void USER_GPIO_Init(void){
@@ -147,8 +141,8 @@ void USER_GPIO_Init(void){
 	// GPIOA->ODR |=	( 0x1UL << 10U); // ODR of PA10: Input pull-up
 
 	// PA0: Potenciometer Pin
-	GPIOA->CRL |= 	( 0x0UL << 2U ); // CNF of PA0: Analog mode
-	GPIOA->CRL |= 	( 0x0UL << 0U ); // MODE of PA0: Input mode (reset state)
+	GPIOA->CRL &= 	~( 0x1UL << 2U ); // CNF of PA0: Analog mode
+	GPIOA->CRL &= 	~( 0x1UL << 0U ); // MODE of PA0: Input mode (reset state)
 
 }
 
@@ -156,25 +150,3 @@ void USER_GPIO_Init(void){
 float map(float x, float in_min, float in_max, float out_min, float out_max) {
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
-// void USER_Delay ( void ) {
-// 	__asm("	ldr r0, =2000 ");
-// 	__asm("again: sub r0, r0, #1 ");
-// 	__asm("	cmp r0, #0 ");
-// 	__asm("	bne again ");
-// }
-
-// void USER_Debounce ( void ) {
-// 	if ((!ROW1_PIN) | (!ROW2_PIN) | (!ROW3_PIN) | (!COL4_PIN)) {
-// 		USER_Delay();
-// 		if (!ROW1_PIN) {
-
-// 		}
-// 		else if (!ROW2_PIN) {
-
-// 		}
-// 		else if (!ROW3_PIN) {
-
-// 		}
-// 	}
-// }

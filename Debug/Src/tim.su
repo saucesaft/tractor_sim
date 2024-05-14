@@ -15,15 +15,3 @@
 ../Src/tim.c:146:6:USER_TIM5_Reset	4	static
 ../Src/tim.c:153:6:USER_TIM5_Start	4	static
 ../Src/tim.c:158:6:USER_TIM5_Delay	4	static
-../Src/tim.c:169:6:USER_TIM9_Init	8	static
-../Src/tim.c:179:6:USER_TIM9_Reset	4	static
-../Src/tim.c:186:6:USER_TIM9_Start	4	static
-../Src/tim.c:191:6:USER_TIM9_Delay	4	static
-../Src/tim.c:202:6:USER_TIM10_Init	8	static
-../Src/tim.c:211:6:USER_TIM10_Reset	4	static
-../Src/tim.c:218:6:USER_TIM10_Start	4	static
-../Src/tim.c:223:6:USER_TIM10_Delay	4	static
-../Src/tim.c:234:6:USER_TIM11_Init	8	static
-../Src/tim.c:243:6:USER_TIM11_Reset	4	static
-../Src/tim.c:250:6:USER_TIM11_Start	4	static
-../Src/tim.c:255:6:USER_TIM11_Delay	4	static
