@@ -73,7 +73,6 @@ int main(void) {
 		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
 
-		}
 	}
 }
 
