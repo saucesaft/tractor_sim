@@ -3,15 +3,17 @@
 #include "tim.h"
 #include "adc.h"
 #include "lcd.h"
+#include "adc.h"
+#include "lcd.h"
 #include "EngTrModel.h"
 
+/* Function prototypes */
 /* Function prototypes */
 void USER_RCC_Init(void);
 void USER_GPIO_Init(void);
 float map(float x, float in_min, float in_max, float out_min, float out_max);
 
-int main(void)
-{	
+int main(void) {
 	uint8_t col = 16;
 
   	USER_RCC_Init();
@@ -25,7 +27,23 @@ int main(void)
 	LCD_Init();
 
 	USER_ADC1_Init();
+	USER_TIM2_Init();
+	USER_TIM3_Init();
+	USER_TIM4_Init();
+	USER_TIM5_Init();
+	USER_TIM9_Init();
+	USER_TIM10_Init();
+	USER_TIM11_Init();
+
+	LCD_Init();
+
+	USER_ADC1_Init();
 	EngTrModel_initialize();
+
+	// ROW 1 - 'A' | Right movement (not used for now)
+	// ROW 2 - 'B' | Brake
+	// ROW 3 - 'C' | Left movement (not used for now)
+
 
 	// ROW 1 - 'A' | Right movement (not used for now)
 	// ROW 2 - 'B' | Brake
@@ -54,8 +72,31 @@ int main(void)
 			}
 		} else {
 			EngTrModel_U.Throttle = acceleration;
+
+		GPIOA->ODR ^= ( 0x1UL << 5U );
+		USER_TIM4_Delay();
+
+		// Reads the value from the potentiometer
+		uint16_t pot_value = USER_ADC1_Read();
+
+		// Scales the potentiometer value to the range of acceleration (0 to 100)
+		float acceleration = map(pot_value, 0, 4095, 0, 100);
+
+		// Key 'B' is pressed and executes brake
+		if ( !(ROW2_PIN) ) {
+			
+			USER_TIM2_Delay(); // 10ms delay for debounce
+
+			if ( !(ROW2_PIN) ) {
+				EngTrModel_U.Throttle = 0.0;
+				EngTrModel_U.BrakeTorque = 100.0;
+			}
+		} else {
+			EngTrModel_U.Throttle = acceleration;
 			EngTrModel_U.BrakeTorque = 0.0;
 		}
+
+		// calculate the model output values
 
 		// calculate the model output values
 		EngTrModel_step();
@@ -68,6 +109,16 @@ int main(void)
 		// printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
 		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
+
+		// set the values in the msgs
+		msg[2] = (uint8_t) EngTrModel_Y.EngineSpeed;
+		msg[4] = (uint8_t) EngTrModel_Y.VehicleSpeed;
+		msg[6] = (uint8_t) EngTrModel_Y.Gear;
+
+		// printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
+		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
+		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
+		}
 	}
 }
 
