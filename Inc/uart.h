@@ -5,14 +5,6 @@
 
 int _write(int file, char *ptr, int len);
 
-
-// USARTDIV 34.722222222
-// Fraction: 0.722222222 * 16 = 11.555555556 ~= 12
-// Mantissa: 34
-
-// [frac] [mantissa]
-// 0x[22] [C]
-
 // config registers
 #define USARTDIV        0x22C				// 115200 baud rate
 #define USART_CR1_UE    ( 0x1UL << 13U ) 	// enable usart peripheral
@@ -44,7 +36,10 @@ int _write(int file, char *ptr, int len);
 // this bit is set by hardware when a parity error occurs in receiver mode
 
 void USER_USART1_Init( void );
+void USER_USART1_Transmit( uint8_t *pData, uint16_t size );
 uint8_t USER_USART1_Read_8bit();
-void USER_UART_Send_Message( uint8_t *msg, uint16_t size);
+void USER_USART1_Send_8bit( uint8_t );
+void USER_UART_Send_Message( uint8_t *msg, uint16_t size );
 
 #endif /* UART_H_ */
+

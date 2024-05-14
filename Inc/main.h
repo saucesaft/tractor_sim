@@ -160,8 +160,7 @@ typedef struct {
 
 #define ROW1_PIN ( GPIOB->IDR & ( 0x1UL << 4U )) // Brake button 'A' | Pin PB_4
 #define ROW2_PIN ( GPIOB->IDR & ( 0x1UL << 5U )) // Right movement 'B' | Pin PB_5
-#define ROW3_PIN ( GPIOB->IDR & ( 0x1UL << 3U )) // Left movement 'C' | Pin PB_3
-#define COL4_PIN ( GPIOA->IDR & ( 0x1UL << 10U )) // Column number of previous 3 rows | Pin PA_10
+#define ROW3_PIN ( GPIOB->IDR & ( 0x1UL << 6U )) // Left movement 'C' | Pin PB_3
 
 #define POT_PIN ( GPIOA->IDR & ( 0x1UL << 0U )) // Potenciometer pin | PA0
 

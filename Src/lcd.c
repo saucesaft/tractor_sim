@@ -56,7 +56,12 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
-	USER_TIM4_Delay();//	Wait for more than 5ms (50ms)
+
+	for (int i = 0; i < 5000; i++) { // Fake 5ms timer
+		USER_TIM5_Delay();
+	}
+
+//	USER_TIM4_Delay();//	Wait for more than 5ms
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -64,7 +69,12 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
 
-	USER_TIM4_Delay();//	Wait for more than 5ms (50ms)
+//	USER_TIM4_Delay();//	Wait for more than 100us
+
+	for (int i = 0; i < 10; i++) { // Fake 100us timer
+		USER_TIM5_Delay();
+	}
+
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -193,7 +203,12 @@ char LCD_Busy(void){
 	GPIOC->BSRR	 =	 LCD_RS_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_RW_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_EN_PIN_HIGH;
-	USER_TIM4_Delay();//	100us (50ms)
+
+	for (int i = 0; i < 10; i++) {
+		USER_TIM5_Delay();
+	}
+
+//	USER_TIM4_Delay();//	100us (50ms)
 	if(( GPIOC->IDR	& LCD_D7_PIN_HIGH )) {//			if D7 is set, then
 		GPIOC->BSRR	= 	LCD_EN_PIN_LOW;
 		GPIOC->BSRR	=	LCD_RW_PIN_LOW;
@@ -222,7 +237,10 @@ void LCD_Pulse_EN(void){
 	GPIOC->BSRR	=	LCD_EN_PIN_HIGH;//			habilita pin EN ON
 	USER_TIM5_Delay();//	10us
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//			habilita pin EN OFF
-	// USER_TIM11_Delay();//	1ms
+
+	for (int i = 0; i < 1000; i++) { // Fake 1ms timer
+		USER_TIM5_Delay();
+	}
 }
 
 /*

@@ -2,8 +2,6 @@
 #include "main.h"
 #include "uart.h"
 
-static void USER_USART1_Send_8bit( uint8_t Data );
-
 void USER_USART1_Init( void ){
 	USART1->CR1	|=	 USART_CR1_UE;//	Step 1 Usart enabled
 	USART1->CR1	&=	~USART_CR1_M;//		Step 2 8 Data bits
@@ -13,7 +11,7 @@ void USER_USART1_Init( void ){
 	USART1->CR1	|= 	 USART_CR1_RE;//	Step 7 Receiver enabled
 }
 
-static void USER_USART1_Send_8bit( uint8_t Data ){
+void USER_USART1_Send_8bit( uint8_t Data ){
 	while(!( USART1->SR & USART_SR_TXE ));//	wait until next data can be written
 	USART1->DR = Data;//				Step 7 Data to send
 }

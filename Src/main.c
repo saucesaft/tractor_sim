@@ -13,16 +13,36 @@ void USER_RCC_Init(void);
 void USER_GPIO_Init(void);
 float map(float x, float in_min, float in_max, float out_min, float out_max);
 
+uint8_t msg[7] = {0xff, 0x80, 0, 0x40, 0, 0x20, 0};
+uint8_t msg_length = sizeof(msg) / sizeof(msg[0]);
+
+void TIM3_IRQHandler( void ){
+	if ( TIM3->SR & TIM3_SR_UIF ){
+		// LCD_Clear();
+		// LCD_Set_Cursor(1, 1);
+
+		GPIOA->ODR ^= ( 0x1UL << 5U );
+
+		USER_UART_Send_Message(msg, msg_length);		// Send the message
+
+//		USER_LCD_Send_Message(msg, msg_length);			// Show the message
+
+		USER_TIM3_Reset();								// Reset the timer
+	}
+}
+
 int main(void) {
-	uint8_t col = 16;
+
+//	uint8_t col = 16;
 
   	USER_RCC_Init();
 	USER_GPIO_Init();
   	USER_USART1_Init();
 	USER_TIM2_Init();
-	USER_TIM3_Init();
 	USER_TIM4_Init();
 	USER_TIM5_Init();
+	USER_TIM3_Init();
+
 
 	LCD_Init();
 
@@ -30,22 +50,28 @@ int main(void) {
 
 	EngTrModel_initialize();
 
-	// ROW 1 - 'A' | Right movement (not used for now)
-	// ROW 2 - 'B' | Brake
-	// ROW 3 - 'C' | Left movement (not used for now)
-
-
-	// ROW 1 - 'A' | Right movement (not used for now)
-	// ROW 2 - 'B' | Brake
-	// ROW 3 - 'C' | Left movement (not used for now)
 
   for(;;)
 	{
+
+//	  LCD_Clear( );
+//
+//	  LCD_Set_Cursor( 1, 1 );
+//
+//	  LCD_Put_Str("hola mundo");
+//
+//	  for (int i = 0; i < 4; i++) {
+//		  USER_TIM4_Delay();
+//	  }
+
+
 		// Reads the value from the potentiometer
 		uint16_t pot_value = USER_ADC1_Read();
 
 		// Scales the potentiometer value to the range of acceleration (0 to 100)
-		float acceleration = map(pot_value, 0, 4095, 0, 100);
+		float acceleration = map(pot_value, 0, 4095, 2, 100);
+
+		//USER_USART1_Send_8bit(acceleration);
 
 		// Key 'B' is pressed and executes brake
 		if ( !(ROW2_PIN) ) {
@@ -53,9 +79,30 @@ int main(void) {
 			USER_TIM2_Delay(); // 10ms delay for debounce
 
 			if ( !(ROW2_PIN) ) {
-				EngTrModel_U.Throttle = 0.0;
+				EngTrModel_U.Throttle = 2.0;
 				EngTrModel_U.BrakeTorque = 100.0;
 			}
+		} else if ( !(ROW1_PIN) ) { // derecha
+
+			USER_TIM2_Delay(); // 10ms delay for debounce
+
+			if ( !(ROW1_PIN) ) {
+
+				EngTrModel_U.Throttle = acceleration * 0.95;
+				EngTrModel_U.BrakeTorque = 0.0;
+			}
+
+		} else if ( !(ROW3_PIN) ) { // izquierda
+
+			USER_TIM2_Delay(); // 10ms delay for debounce
+
+			if ( !(ROW3_PIN) ) {
+
+
+				EngTrModel_U.Throttle = acceleration * 0.95;
+				EngTrModel_U.BrakeTorque = 0.0;
+			}
+
 		} else {
 			EngTrModel_U.Throttle = acceleration;
 			EngTrModel_U.BrakeTorque = 0.0;
@@ -68,11 +115,6 @@ int main(void) {
 		msg[2] = (uint8_t) EngTrModel_Y.EngineSpeed;
 		msg[4] = (uint8_t) EngTrModel_Y.VehicleSpeed;
 		msg[6] = (uint8_t) EngTrModel_Y.Gear;
-
-		// printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
-		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
-		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
-
 	}
 }
 
@@ -133,21 +175,21 @@ void USER_GPIO_Init(void){
 	GPIOB->CRL |=	( 0x0UL << 20U ); // MODE of PB5: Input mode (reset state)
 	GPIOB->ODR |=	( 0x1UL <<  5U); // ODR of PB5: Input pull-up
 
-	// PB3: 'C' | Left movement
-	GPIOB->CRL &=  ~( 0x3UL << 14U ) & ~( 0x3UL << 12U ); // Clear to CNF and MODE bits
-	GPIOB->CRL |=	( 0x2UL << 14U ); // CNF of PB3: Input with pull-up/pull-down
-	GPIOB->CRL |=	( 0x0UL << 12U ); // MODE of PB3: Input mode (reset state)
-	GPIOB->ODR |=	( 0x1UL <<  3U); // ODR of PB3: Input pull-up
-
-	// // PA10: Column number for 'A', 'B' and 'C'
-	// GPIOA->CRH &=  ~( 0x3UL << 10U ) & ~( 0x3UL << 8U ); // Clear to CNF and MODE bits
-	// GPIOA->CRH |=	( 0x2UL << 10U ); // CNF of PA10: Input with pull-up/pull-down
-	// GPIOA->CRH |=	( 0x0UL << 8U ); // MODE of PA10: Input mode (reset state)
-	// GPIOA->ODR |=	( 0x1UL << 10U); // ODR of PA10: Input pull-up
+	// PB6: 'C' | Left movement
+	GPIOB->CRL &=  ~( 0x3UL << 26U ) & ~( 0x3UL << 24U ); // Clear to CNF and MODE bits
+	GPIOB->CRL |=	( 0x2UL << 26U ); // CNF of PB3: Input with pull-up/pull-down
+	GPIOB->CRL |=	( 0x0UL << 24U ); // MODE of PB3: Input mode (reset state)
+	GPIOB->ODR |=	( 0x1UL <<  6U); // ODR of PB3: Input pull-up
 
 	// PA0: Potenciometer Pin
 	GPIOA->CRL &= 	~( 0x1UL << 2U ); // CNF of PA0: Analog mode
 	GPIOA->CRL &= 	~( 0x1UL << 0U ); // MODE of PA0: Input mode (reset state)
+
+	GPIOA->CRH	&=	~( 0x1UL <<  6U )
+				&	~( 0x2UL <<  4U );
+
+	GPIOA->CRH	|=	 ( 0x2UL <<  6U )
+				|	 ( 0x1UL <<  4U );
 
 }
 

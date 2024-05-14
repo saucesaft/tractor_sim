@@ -10,6 +10,7 @@
 
 // Function that initializes TIM2 with constant values from tim.h
 void USER_TIM2_Init( void ){
+
 	TIM2->SMCR &= ~(TIM2_SMCR_SMS); 	// Enable the internal clock source
 	TIM2->CR1 &= ~(TIM2_CR1_EA); 		// Set edge-aligned mode
 	TIM2->CR1 &= ~(TIM2_CR1_UC); 		// Set up-counter mode
@@ -74,21 +75,6 @@ void USER_TIM3_Delay( void ){
 	while(!( TIM3->SR & TIM3_SR_UIF ));
 
 	TIM3->CR1 &= ~(TIM3_CR1_CEN);		// Stop the timer
-}
-
-void TIM3_IRQHandler( void ){
-	if ( TIM3->SR & TIM3_SR_UIF ){
-		// LCD_Clear();
-		// LCD_Set_Cursor(1, 1);
-
-		GPIOA->ODR ^= ( 0x1UL << 5U );
-
-		// USER_UART_Send_Message(msg, msg_length);		// Send the message
-
-		// USER_LCD_Send_Message(msg, msg_length);			// Show the message
-
-		USER_TIM3_Reset();								// Reset the timer
-	}
 }
 
 /////////////

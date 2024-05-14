@@ -9,8 +9,6 @@
 // 0x80 signals velocity of the motor
 // 0x40 signals speed of the vehicle
 // 0x20 signals the gear
-static uint8_t msg[6] = {0xff, 0x80, 0x00, 0x40, 0x00, 0x20, 0x00};
-static int msg_length = sizeof(msg) / sizeof(msg[0]);
 
 // config registers -> 10 ms
 #define TIM2_PSC	9UL
