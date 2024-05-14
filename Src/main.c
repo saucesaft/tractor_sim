@@ -27,17 +27,7 @@ int main(void) {
 	LCD_Init();
 
 	USER_ADC1_Init();
-	USER_TIM2_Init();
-	USER_TIM3_Init();
-	USER_TIM4_Init();
-	USER_TIM5_Init();
-	USER_TIM9_Init();
-	USER_TIM10_Init();
-	USER_TIM11_Init();
 
-	LCD_Init();
-
-	USER_ADC1_Init();
 	EngTrModel_initialize();
 
 	// ROW 1 - 'A' | Right movement (not used for now)
