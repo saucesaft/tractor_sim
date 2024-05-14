@@ -41,31 +41,6 @@ int main(void) {
 
   for(;;)
 	{
-
-		GPIOA->ODR ^= ( 0x1UL << 5U );
-		USER_TIM4_Delay();
-
-		// Reads the value from the potentiometer
-		uint16_t pot_value = USER_ADC1_Read();
-
-		// Scales the potentiometer value to the range of acceleration (0 to 100)
-		float acceleration = map(pot_value, 0, 4095, 0, 100);
-
-		// Key 'B' is pressed and executes brake
-		if ( !(ROW2_PIN) ) {
-			
-			USER_TIM2_Delay(); // 10ms delay for debounce
-
-			if ( !(ROW2_PIN) ) {
-				EngTrModel_U.Throttle = 0.0;
-				EngTrModel_U.BrakeTorque = 100.0;
-			}
-		} else {
-			EngTrModel_U.Throttle = acceleration;
-
-		GPIOA->ODR ^= ( 0x1UL << 5U );
-		USER_TIM4_Delay();
-
 		// Reads the value from the potentiometer
 		uint16_t pot_value = USER_ADC1_Read();
 
@@ -87,8 +62,6 @@ int main(void) {
 		}
 
 		// calculate the model output values
-
-		// calculate the model output values
 		EngTrModel_step();
 
 		// set the values in the msgs
@@ -100,14 +73,6 @@ int main(void) {
 		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
 		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
 
-		// set the values in the msgs
-		msg[2] = (uint8_t) EngTrModel_Y.EngineSpeed;
-		msg[4] = (uint8_t) EngTrModel_Y.VehicleSpeed;
-		msg[6] = (uint8_t) EngTrModel_Y.Gear;
-
-		// printf("Vehicle Speed: %f\r\n", EngTrModel_Y.VehicleSpeed);
-		// printf("Engine Speed: %f\r\n", EngTrModel_Y.EngineSpeed);
-		// printf("Gear: %f\r\n", EngTrModel_Y.Gear);
 		}
 	}
 }
