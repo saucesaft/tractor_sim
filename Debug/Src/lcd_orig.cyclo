@@ -1,0 +1,12 @@
+../Src/lcd_orig.c:19:6:LCD_Init	4
+../Src/lcd_orig.c:103:6:LCD_Out_Data4	5
+../Src/lcd_orig.c:126:6:LCD_Write_Byte	2
+../Src/lcd_orig.c:135:6:LCD_Write_Cmd	1
+../Src/lcd_orig.c:141:6:LCD_Put_Char	1
+../Src/lcd_orig.c:148:6:LCD_Set_Cursor	1
+../Src/lcd_orig.c:158:6:LCD_Put_Str	3
+../Src/lcd_orig.c:165:6:LCD_Put_Num	6
+../Src/lcd_orig.c:185:6:LCD_Busy	2
+../Src/lcd_orig.c:217:6:LCD_Pulse_EN	1
+../Src/lcd_orig.c:231:6:LCD_BarGraphic	3
+../Src/lcd_orig.c:248:6:LCD_BarGraphicXY	4

@@ -18,13 +18,13 @@
 #define TIM3_PSC	195UL
 #define TIM3_CNT	230UL
 
-// config registers -> 50 ms
-#define TIM4_PSC	48UL
-#define TIM4_CNT    230UL
+// config registers -> 10 us
+#define TIM4_PSC	0UL
+#define TIM4_CNT    64896UL
 
 // config registers -> 10 us
-#define TIM5_PSC	0UL
-#define TIM5_CNT    64896UL
+//#define TIM5_PSC	0UL
+//#define TIM5_CNT    64896UL
 
 // enable internal clock source
 #define TIM2_SMCR_SMS   ( 0x7UL << 0U )
@@ -111,31 +111,5 @@ void USER_TIM4_Reset( void );
 void USER_TIM4_Start( void );
 
 void USER_TIM4_Delay( void );
-
-// enable internal clock source
-#define TIM5_SMCR_SMS   ( 0x7UL << 0U )
-
-// edge aligned mode
-#define TIM5_CR1_EA     ( 0x3UL << 5U )
-
-// up counter (direction)
-#define TIM5_CR1_UC     ( 0x1UL << 4U )
-
-// uev enabled
-#define TIM5_CR1_UEV    ( 0x1UL << 1U )
-
-// enable the timer
-#define TIM5_CR1_CEN	( 0x1UL << 0U )
-
-// update interrupt flag
-#define TIM5_SR_UIF		( 0x1UL << 0U )
-
-void USER_TIM5_Init( void );
-
-void USER_TIM5_Reset( void );
-
-void USER_TIM5_Start( void );
-
-void USER_TIM5_Delay( void );
 
 #endif /* TIM_H_ */

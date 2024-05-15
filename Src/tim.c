@@ -111,38 +111,3 @@ void USER_TIM4_Delay( void ){
 
 	TIM4->CR1 &= ~(TIM4_CR1_CEN);		// Stop the timer
 }
-
-/////////////
-// TIMER 5 //
-/////////////
-
-// Function that initializes TIM5 with constant values from tim.h
-void USER_TIM5_Init( void ){
-	TIM5->SMCR &= ~(TIM5_SMCR_SMS); 	// Enable the internal clock source
-	TIM5->CR1 &= ~(TIM5_CR1_EA); 		// Set edge-aligned mode
-	TIM5->CR1 &= ~(TIM5_CR1_UC); 		// Set up-counter mode
-	TIM5->CR1 &= ~(TIM5_CR1_UEV); 		// Set UEV enabled
-
-	USER_TIM5_Reset(); // Executes reset function
-
-	USER_TIM5_Start(); // Executes start function
-}
-
-// Set/Reset the values needed to count
-void USER_TIM5_Reset( void ){
-	TIM5->SR &= ~(TIM5_SR_UIF);			// Clear the timer update interrupt flag
-	TIM5->CNT = TIM5_CNT;				// Set initial count
-	TIM5->PSC = TIM5_PSC;				// Set prescaler
-}
-
-// Start the counting
-void USER_TIM5_Start( void ){
-	TIM5->CR1 |= TIM5_CR1_CEN;			// Start counting
-}
-
-// Wait until the timer overflows and stop the timer
-void USER_TIM5_Delay( void ){
-	while(!( TIM2->SR & TIM5_SR_UIF ));
-
-	TIM5->CR1 &= ~(TIM5_CR1_CEN);		// Stop the timer
-}

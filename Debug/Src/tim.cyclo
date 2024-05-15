@@ -10,7 +10,3 @@
 ../Src/tim.c:97:6:USER_TIM4_Reset	1
 ../Src/tim.c:104:6:USER_TIM4_Start	1
 ../Src/tim.c:109:6:USER_TIM4_Delay	2
-../Src/tim.c:120:6:USER_TIM5_Init	1
-../Src/tim.c:132:6:USER_TIM5_Reset	1
-../Src/tim.c:139:6:USER_TIM5_Start	1
-../Src/tim.c:144:6:USER_TIM5_Delay	2

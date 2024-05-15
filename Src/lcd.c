@@ -22,7 +22,6 @@ void LCD_Init(void){
 /**
   * Configuracion de todos los pines hacia el LCD general purpose output push-pull, 10 MHz speed
   */
-	RCC->APB2ENR	|=	 ( 0x1UL <<  4U );//			IO port C clock enable	
 	GPIOC->CRL	&=	~( 0x3UL << 30U ) & ~( 0x2UL << 28U )
 			& 	~( 0x3UL << 26U ) & ~( 0x2UL << 24U );
 	GPIOC->CRL 	|= 	 ( 0x1UL << 28U )
@@ -49,7 +48,11 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D5_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D6_PIN_LOW;
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
-	USER_TIM4_Delay();//	50ms
+
+	for (int i = 0; i < 5000; i++) { // Fake 50 ms timer
+			USER_TIM4_Delay();
+		}
+
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -57,11 +60,10 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
 
-	for (int i = 0; i < 5000; i++) { // Fake 5ms timer
-		USER_TIM5_Delay();
+	for (int i = 0; i < 500; i++) { // Fake 5ms timer
+		USER_TIM4_Delay();
 	}
 
-//	USER_TIM4_Delay();//	Wait for more than 5ms
 	/* Special case of 'Function Set' 				*/
 	GPIOC->BSRR	 =	 LCD_D4_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_D5_PIN_HIGH;
@@ -69,10 +71,8 @@ void LCD_Init(void){
 	GPIOC->BSRR	 =	 LCD_D7_PIN_LOW;
 	LCD_Pulse_EN( );
 
-//	USER_TIM4_Delay();//	Wait for more than 100us
-
-	for (int i = 0; i < 10; i++) { // Fake 100us timer
-		USER_TIM5_Delay();
+	for (int i = 0; i < 10; i++) { // Fake 10us timer
+		USER_TIM4_Delay();
 	}
 
 	/* Special case of 'Function Set' 				*/
@@ -204,8 +204,8 @@ char LCD_Busy(void){
 	GPIOC->BSRR	 =	 LCD_RW_PIN_HIGH;
 	GPIOC->BSRR	 =	 LCD_EN_PIN_HIGH;
 
-	for (int i = 0; i < 10; i++) {
-		USER_TIM5_Delay();
+	for (int i = 0; i < 1000; i++) { // fake 100 us timer
+		USER_TIM4_Delay();
 	}
 
 //	USER_TIM4_Delay();//	100us (50ms)
@@ -233,13 +233,21 @@ char LCD_Busy(void){
 //Funcion que genera un pulso en el pin EN del LCD
 void LCD_Pulse_EN(void){
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//
-	USER_TIM5_Delay();//	10us
+
+	for (int i = 0; i < 100; i++) { // Fake 1ms timer
+		USER_TIM4_Delay();
+	}
+
 	GPIOC->BSRR	=	LCD_EN_PIN_HIGH;//			habilita pin EN ON
-	USER_TIM5_Delay();//	10us
+
+	for (int i = 0; i < 100; i++) { // Fake 1ms timer
+		USER_TIM4_Delay();
+	}
+
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//			habilita pin EN OFF
 
-	for (int i = 0; i < 1000; i++) { // Fake 1ms timer
-		USER_TIM5_Delay();
+	for (int i = 0; i < 100; i++) { // Fake 1ms timer
+		USER_TIM4_Delay();
 	}
 }
 
@@ -280,10 +288,40 @@ void LCD_BarGraphicXY(int16_t pos_x, int16_t pos_y, int16_t value){
 }
 
 void USER_LCD_Send_Message( uint8_t *msg, uint16_t size ){
-	LCD_Put_Str("Vehicle Speed: ");
-	LCD_Put_Num( msg[4] );
-	LCD_Put_Str("Engine Speed: ");
-	LCD_Put_Num( msg[2] );
-	LCD_Put_Str("Gear: ");
-	LCD_Put_Num( msg[6] );
+
+	// Following this scheme, we show the values on the LCD
+	
+	// 	msg[2] = (uint8_t) e_speed & 0xff;
+	//	msg[3] = (uint8_t) (e_speed >> 8);
+	//
+	//
+	//	msg[5] = (uint8_t) v_speed & 0xff;
+	//	msg[6] = (uint8_t) (v_speed >> 8);
+	//
+	//	msg[8] = (uint8_t) gear & 0xff;
+	//	msg[9] = (uint8_t) (gear >> 8);
+
+	LCD_Put_Str( "e:");
+	LCD_Put_Num( (msg[3] << 8) | msg[2] );
+
+
+	LCD_Put_Str(" v:");
+	LCD_Put_Num( (msg[6] << 8) | msg[5] );
+
+	LCD_Set_Cursor(2, 1);
+
+	LCD_Put_Str("g:");
+	LCD_Put_Num( (msg[9] << 8) | msg[8] );
+	LCD_Put_Str(" ");
+
+	if (msg[10] == 3) {
+		LCD_Put_Str("brake");
+	}
+	else if (msg[10] == 1) {
+		LCD_Put_Str("right");
+	}
+	else if (msg[10] == 2) {
+		LCD_Put_Str("left");
+	}
+
 }

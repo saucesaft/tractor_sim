@@ -10,7 +10,3 @@
 ../Src/tim.c:97:6:USER_TIM4_Reset	4	static
 ../Src/tim.c:104:6:USER_TIM4_Start	4	static
 ../Src/tim.c:109:6:USER_TIM4_Delay	4	static
-../Src/tim.c:120:6:USER_TIM5_Init	8	static
-../Src/tim.c:132:6:USER_TIM5_Reset	4	static
-../Src/tim.c:139:6:USER_TIM5_Start	4	static
-../Src/tim.c:144:6:USER_TIM5_Delay	4	static
