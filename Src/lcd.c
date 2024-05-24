@@ -233,16 +233,10 @@ char LCD_Busy(void){
 //Funcion que genera un pulso en el pin EN del LCD
 void LCD_Pulse_EN(void){
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//
-
-	for (int i = 0; i < 100; i++) { // Fake 1ms timer
-		USER_TIM4_Delay();
-	}
+	USER_TIM4_Delay();
 
 	GPIOC->BSRR	=	LCD_EN_PIN_HIGH;//			habilita pin EN ON
-
-	for (int i = 0; i < 100; i++) { // Fake 1ms timer
-		USER_TIM4_Delay();
-	}
+	USER_TIM4_Delay();
 
 	GPIOC->BSRR	=	LCD_EN_PIN_LOW;//			habilita pin EN OFF
 

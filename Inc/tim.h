@@ -1,6 +1,8 @@
 #ifndef TIM_H_
 #define TIM_H_
 
+#include <math.h>
+
 ///////////////
 // msg state //
 ///////////////
@@ -14,9 +16,12 @@
 #define TIM2_PSC	9UL
 #define TIM2_CNT	1536UL
 
-// config registers -> 200 ms
-#define TIM3_PSC	195UL
-#define TIM3_CNT	230UL
+// config registers -> 1 s
+#define SYSCLK             64000000
+#define T_HCLK             ( 1.0 / SYSCLK )
+#define TIM_TIME_1S        1.0
+#define TIM3_PSC      ( ceil( TIM_TIME_1S / ( T_HCLK * (( 65535 + 1) - 0 ))) - 1 )
+#define TIM3_CNT  (( 65535 + 1 ) - ( round( TIM_TIME_1S / ( T_HCLK * ( TIM3_PSC + 1 )))))
 
 // config registers -> 10 us
 #define TIM4_PSC	0UL
@@ -50,7 +55,7 @@ void USER_TIM2_Reset( void );
 
 void USER_TIM2_Start( void );
 
-void USER_TIM2_Delay( void );
+void USER_TIM2_Delay( uint16_t prescaler, uint16_t count );
 
 // enable internal clock source
 #define TIM3_SMCR_SMS   ( 0x7UL << 0U )
@@ -80,11 +85,7 @@ void USER_TIM3_Init( void );
 
 void USER_TIM3_Reset( void );
 
-void USER_TIM3_Start( void );
-
 void USER_TIM3_Delay( void );
-
-void TIM3_IRQHandler( void );
 
 // enable internal clock source
 #define TIM4_SMCR_SMS   ( 0x7UL << 0U )

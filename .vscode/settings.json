@@ -1,3 +1,8 @@
 {
-    "cmake.sourceDirectory": "/Users/saucesaft/Developer/STM32/tractor_sim/tractor_sim"
+    "files.associations": {
+        "stdint.h": "c",
+        "main.h": "c",
+        "adc.h": "c",
+        "tasks.h": "c"
+    }
 }
