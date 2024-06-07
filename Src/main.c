@@ -13,20 +13,19 @@ float map(float x, float in_min, float in_max, float out_min, float out_max);
 //// msg to send ////
 // [bytes]:
 // [0] 0xff marks the start of a new message
-// [1] 0x80 signals velocity of the motor
-// [2] lsb of value
-// [3] msb of value
-// [4] 0x40 signals speed of the vehicle
-// [5] lsb of value
-// [6] msb of value
-// [7] 0x20 signals the gear
-// [8] lsb of value
-// [9] msb of value
-// (not send to serial) [10] 0x00 signals the action to take (0: nothing, 1: right, 2: left, 3: brake)
+// [1] 0xff marks the start of a new message
+// [2] 0xff marks the start of a new message
+// [3] lsb of engine speed
+// [4] msb of engine speed
+// [5] lsb of vehicle speed
+// [6] msb of vehicle speed
+// [7] lsb of gear
+// [8] msb of gear
+// [9] 0x00 signals the action to take (0: nothing, 1: right, 2: left, 3: brake)
 /////////////////////
 
-uint8_t msg[11] = {0xff, 0x80, 0x00, 0x00, 0x40, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00};
-uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) ) - 1; // we substract 1 because we don't send the last byte (the direction/brake)
+uint8_t msg[10] = {0xaa, 0xbb, 0xcc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) ); // we substract 1 because we don't send the last byte (the direction/brake)
 
 /* 
 	Timer 3 Interrupt Handler
@@ -94,7 +93,7 @@ int main(void) {
 			if ( !(ROW2_PIN) ) {
 				EngTrModel_U.Throttle = 2.0;
 				EngTrModel_U.BrakeTorque = 100.0;
-				msg[10] = (uint8_t) 3;
+				msg[9] = (uint8_t) 3;
 			}
 		} else if ( !(ROW1_PIN) ) { // derecha
 
@@ -104,7 +103,7 @@ int main(void) {
 
 				EngTrModel_U.Throttle = acceleration * 0.95;
 				EngTrModel_U.BrakeTorque = 0.0;
-				msg[10] = (uint8_t) 1;
+				msg[9] = (uint8_t) 1;
 			}
 
 		} else if ( !(ROW3_PIN) ) { // izquierda
@@ -116,13 +115,13 @@ int main(void) {
 
 				EngTrModel_U.Throttle = acceleration * 0.95;
 				EngTrModel_U.BrakeTorque = 0.0;
-				msg[10] = (uint8_t) 2;
+				msg[9] = (uint8_t) 2;
 			}
 
 		} else {
 			EngTrModel_U.Throttle = acceleration;
 			EngTrModel_U.BrakeTorque = 0.0;
-			msg[10] = (uint8_t) 0;
+			msg[9] = (uint8_t) 0;
 		}
 
 		// Calculate the model output values
@@ -135,15 +134,24 @@ int main(void) {
 		uint16_t v_speed = (uint16_t) EngTrModel_Y.VehicleSpeed;
 		uint8_t gear = (uint8_t) EngTrModel_Y.Gear;
 
-		msg[2] = (uint8_t) e_speed & 0xff;
-		msg[3] = (uint8_t) (e_speed >> 8);
+		/////////////////////
+		// [3] lsb of engine speed
+		// [4] msb of engine speed
+		// [5] lsb of vehicle speed
+		// [6] msb of vehicle speed
+		// [7] lsb of gear
+		// [8] msb of gear
+		/////////////////////
+
+		msg[3] = (uint8_t) e_speed & 0xff;
+		msg[4] = (uint8_t) (e_speed >> 8);
 
 
 		msg[5] = (uint8_t) v_speed & 0xff;
 		msg[6] = (uint8_t) (v_speed >> 8);
 
-		msg[8] = (uint8_t) gear & 0xff;
-		msg[9] = (uint8_t) (gear >> 8);
+		msg[7] = (uint8_t) gear & 0xff;
+		msg[8] = (uint8_t) (gear >> 8);
 	}
 }
 

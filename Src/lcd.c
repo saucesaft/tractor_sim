@@ -291,18 +291,28 @@ void USER_LCD_Send_Message( uint8_t *msg, uint16_t size ){
 
 	// Following this scheme, we show the values on the LCD
 	
-	// 	msg[2] = (uint8_t) e_speed & 0xff;
-	//	msg[3] = (uint8_t) (e_speed >> 8);
+
+	/////////////////////
+	// [3] lsb of engine speed
+	// [4] msb of engine speed
+	// [5] lsb of vehicle speed
+	// [6] msb of vehicle speed
+	// [7] lsb of gear
+	// [8] msb of gear
+	/////////////////////
+
+	// 	msg[3] = (uint8_t) e_speed & 0xff;
+	//	msg[4] = (uint8_t) (e_speed >> 8);
 	//
 	//
 	//	msg[5] = (uint8_t) v_speed & 0xff;
 	//	msg[6] = (uint8_t) (v_speed >> 8);
 	//
-	//	msg[8] = (uint8_t) gear & 0xff;
-	//	msg[9] = (uint8_t) (gear >> 8);
+	//	msg[7] = (uint8_t) gear & 0xff;
+	//	msg[8] = (uint8_t) (gear >> 8);
 
 	LCD_Put_Str( "e:");
-	LCD_Put_Num( (msg[3] << 8) | msg[2] );
+	LCD_Put_Num( (msg[4] << 8) | msg[3] );
 
 
 	LCD_Put_Str(" v:");
@@ -311,16 +321,16 @@ void USER_LCD_Send_Message( uint8_t *msg, uint16_t size ){
 	LCD_Set_Cursor(2, 1);
 
 	LCD_Put_Str("g:");
-	LCD_Put_Num( (msg[9] << 8) | msg[8] );
+	LCD_Put_Num( (msg[8] << 8) | msg[7] );
 	LCD_Put_Str(" ");
 
-	if (msg[10] == 3) {
+	if (msg[9] == 3) {
 		LCD_Put_Str("brake");
 	}
-	else if (msg[10] == 1) {
+	else if (msg[9] == 1) {
 		LCD_Put_Str("right");
 	}
-	else if (msg[10] == 2) {
+	else if (msg[9] == 2) {
 		LCD_Put_Str("left");
 	}
 
