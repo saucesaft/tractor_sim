@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/saucesaft/Developer/STM32/tractor_sim/tractor_sim"
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cmake.configureOnOpen": true
 }

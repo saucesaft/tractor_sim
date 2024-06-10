@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/Users/saucesaft/Developer/STM32/tractor_sim/build/relWithDebInfo",
+  "command": "/opt/ST/STM32CubeCLT_1.15.1/GNU-tools-for-STM32/bin/arm-none-eabi-gcc -I/Users/saucesaft/Developer/STM32/tractor_sim/Inc -fdata-sections -ffunction-sections -Wl,--gc-sections -O2 -g -DNDEBUG -mthumb -mcpu=cortex-m3 -Wall -Wextra -Wpedantic -Wno-unused-parameter -std=gnu11 -o CMakeFiles/tractor_sim.dir/Src/main.c.obj -c /Users/saucesaft/Developer/STM32/tractor_sim/Src/main.c",
+  "file": "/Users/saucesaft/Developer/STM32/tractor_sim/Src/main.c"
+},
+{
+  "directory": "/Users/saucesaft/Developer/STM32/tractor_sim/build/relWithDebInfo",
+  "command": "/opt/ST/STM32CubeCLT_1.15.1/GNU-tools-for-STM32/bin/arm-none-eabi-gcc -I/Users/saucesaft/Developer/STM32/tractor_sim/Inc -fdata-sections -ffunction-sections -Wl,--gc-sections -O2 -g -DNDEBUG -mthumb -mcpu=cortex-m3 -Wall -Wextra -Wpedantic -Wno-unused-parameter -std=gnu11 -o CMakeFiles/tractor_sim.dir/Src/syscall.c.obj -c /Users/saucesaft/Developer/STM32/tractor_sim/Src/syscall.c",
+  "file": "/Users/saucesaft/Developer/STM32/tractor_sim/Src/syscall.c"
+},
+{
+  "directory": "/Users/saucesaft/Developer/STM32/tractor_sim/build/relWithDebInfo",
+  "command": "/opt/ST/STM32CubeCLT_1.15.1/GNU-tools-for-STM32/bin/arm-none-eabi-gcc -I/Users/saucesaft/Developer/STM32/tractor_sim/Inc -fdata-sections -ffunction-sections -Wl,--gc-sections -O2 -g -DNDEBUG -mthumb -mcpu=cortex-m3 -Wall -Wextra -Wpedantic -Wno-unused-parameter -std=gnu11 -o CMakeFiles/tractor_sim.dir/Src/sysmem.c.obj -c /Users/saucesaft/Developer/STM32/tractor_sim/Src/sysmem.c",
+  "file": "/Users/saucesaft/Developer/STM32/tractor_sim/Src/sysmem.c"
+},
+{
+  "directory": "/Users/saucesaft/Developer/STM32/tractor_sim/build/relWithDebInfo",
+  "command": "/opt/ST/STM32CubeCLT_1.15.1/GNU-tools-for-STM32/bin/arm-none-eabi-gcc -I/Users/saucesaft/Developer/STM32/tractor_sim -O2 -g -DNDEBUG -mthumb -mcpu=cortex-m3 -Wall -Wextra -Wpedantic -Wno-unused-parameter -x assembler-with-cpp -MMD -MP -o CMakeFiles/tractor_sim.dir/Startup/startup_stm32f103rbtx.s.obj -c /Users/saucesaft/Developer/STM32/tractor_sim/Startup/startup_stm32f103rbtx.s",
+  "file": "/Users/saucesaft/Developer/STM32/tractor_sim/Startup/startup_stm32f103rbtx.s"
+}
+]
