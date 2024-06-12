@@ -14,8 +14,9 @@
 
 
 ### TODO
-- [ ] ⁠agregar FreeRTOS a nuestro proyecto
-- [ ] hacer todo con tasks (priority scheduler)
+- [X] ⁠agregar FreeRTOS a nuestro proyecto
+- [X] hacer todo con tasks (priority scheduler)
+- [ ] datos compartidos (queues, etc)
 - [ ] activar el RX del serial en la STM
 - [ ] añadir modos a nuestra comunicación
 - [ ] modo 1, que los datos sean con lo que te manda la stm
