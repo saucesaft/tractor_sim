@@ -1,6 +1,6 @@
 <div align="center">
 
-# Tractor Simulator
+# Tractor Simulator (now with freertos)
 
 ##### Tractor gearbox simulation
 
@@ -13,20 +13,15 @@
 </div>
 
 
-### todo
-Desarrollar código en C que permita transmitir mediante el UART los valores de velocidad del motor, velocidad del vehículo y la marcha, de un modelo del controlador de transmisión automática de un vehículo.
-- [X] Cambiar frecuencia
-- [X] Inputs
-    - [X] Teclado matricial
-    - [X] Potenciometro
-- [X] Timers
-    - TIM2 10ms
-    - TIM3 200ms
-    - TIM4 50ms 100us 1ms
-    - TIM5 5ms 10us
-    <!-- - TIM9 100us -->
-    <!-- - TIM10 10us -->
-    <!-- - TIM11 1ms -->
-- [X] Outputs
-    - [X] LCD
-    - [X] UART
+### TODO
+- [X] ⁠agregar FreeRTOS a nuestro proyecto
+- [X] hacer todo con tasks (priority scheduler)
+- [ ] datos compartidos (queues, etc)
+- [ ] activar el RX del serial en la STM
+- [ ] añadir modos a nuestra comunicación
+- [ ] modo 1, que los datos sean con lo que te manda la stm
+- [ ] modo 2, que los datos sean los que mandes a traves de la interfaz web
+- [ ] agregar 2 leds que sean como las direccionales dependiendo del lado
+
+si tenemos tiempo:
+- [ ] agregar soporte para el joystick (adelante es aceleración) (izquierda, derecha es dirección) (boton es freno)
