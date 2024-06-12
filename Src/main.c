@@ -17,9 +17,14 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+
+#include <cmsis_os.h>
 
 int main(void)
 {
     /* Loop forever */
-	for(;;);
+	for(;;) {
+        printf("Hello World\n");
+    }
 }

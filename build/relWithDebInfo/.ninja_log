@@ -1,6 +1,0 @@
-# ninja log v5
-2	82	1717985917987332901	CMakeFiles/tractor_sim.dir/Startup/startup_stm32f103rbtx.s.obj	29a191fe1cb27567
-1	107	1717985918014043520	CMakeFiles/tractor_sim.dir/Src/main.c.obj	40ac7508a50bd342
-1	145	1717985918051061514	CMakeFiles/tractor_sim.dir/Src/sysmem.c.obj	efbecf7ab06ba079
-1	273	1717985918177842509	CMakeFiles/tractor_sim.dir/Src/syscall.c.obj	44ac7a96b126bb71
-274	876	1717985918284350996	tractor_sim.elf	9539043072f68efe
