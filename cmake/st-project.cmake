@@ -72,6 +72,7 @@ target_sources(
     ${TARGET_NAME} PRIVATE
     "Core/Src/freertos.c"
     "Core/Src/main.c"
+    "Core/Src/tasks.c"
     "Core/Src/stm32f1xx_hal_msp.c"
     "Core/Src/stm32f1xx_hal_timebase_tim.c"
     "Core/Src/stm32f1xx_it.c"

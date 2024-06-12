@@ -32,7 +32,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+uint8_t msg[11] = {0xff, 0x80, 0x00, 0x00, 0x40, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00};
+uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) ) - 1; // we substract 1 because we don't send the last byte (the direction/brake)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,17 @@ UART_HandleTypeDef huart2;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-
+osThreadId defaultTaskHandle;
+osThreadId Task1Init;
+osThreadId Task1Exec;
+osThreadId Task2Init;
+osThreadId Task2Exec;
+osThreadId Task3Init;
+osThreadId Task3Exec;
+osThreadId Task4Init;
+osThreadId Task4Init;
+osThreadId Task5Init;
+osThreadId Task5Init;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,6 +71,27 @@ void StartDefaultTask(void const * argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/* Task method initialization */
+// Task 1 reads the data inputs from the potentiometer values and the keypad
+void TaskRead1_Init( void const * argument );
+void TaskRead1_Execute( void const * argument );
+
+// Task 2 uses values generated in Task 1 to create the data simulating the vehicle
+void TaskCreateData2_Init( void const * argument );
+void TaskCreateData2_Execute( void const * argument );
+
+// Task 3 sends and writes the data to the LCD
+void TaskLCD3_Init( void const * argument );
+void TaskLCD3_Execute( void const * argument );
+
+// Task 4 sends information through the serial port to the Raspberry Pi
+void TaskSerial4_Init( void const * argument );
+void TaskSerial4_Execute( void const * argument );
+
+// Task 5 recieves information from the serial port
+void TaskRX5_Init( void const * argument );
+void TaskRX5_Execute( void const * argument  );
 
 /* USER CODE END 0 */
 
@@ -119,7 +151,35 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  osThreadDef(ReadInit, TaskRead1_Init, osPriorityRealtime, 1, 128);
+  Task1Init = osThreadCreate(osThread(ReadInit), NULL);
+
+  osThreadDef(ReadExec, TaskRead1_Execute, osPriorityNormal, 1, 128);
+  Task1Exec = osThreadCreate(osThread(ReadExec), NULL);
+
+  osThreadDef(CreateInit, TaskCreateData2_Init, osPriorityRealtime, 1, 128);
+  Task2Init = osThreadCreate(osThread(CreateInit), NULL);
+
+  osThreadDef(CreateExec, TaskCreateData2_Execute, osPriorityNormal, 1, 128);
+  Task2Exec = osThreadCreate(osThread(CreateExec), NULL);
+
+  osThreadDef(LCDInit, TaskLCD3_Init, osPriorityRealtime, 1, 128);
+  Task3Init = osThreadCreate(osThread(LCDInit), NULL);
+
+  osThreadDef(LCDExec, TaskLCD3_Execute, osPriorityNormal, 1, 128);
+  Task3Exec = osThreadCreate(osThread(LCDExec), NULL);
+
+  osThreadDef(SerialInit, TaskSerial4_Init, osPriorityRealtime, 1, 128);
+  Task4Init = osThreadCreate(osThread(SerialInit), NULL);
+
+  osThreadDef(SerialExec, TaskSerial4_Execute, osPriorityNormal, 1, 128);
+  Task4Init = osThreadCreate(osThread(SerialExec), NULL);
+
+  osThreadDef(RXInit, TaskRX5_Init, osPriorityRealtime, 1, 128);
+  Task5Init = osThreadCreate(osThread(RXInit), NULL);
+
+  osThreadDef(RXExec, TaskRX5_Execute, osPriorityNormal, 1, 128);
+  Task5Init = osThreadCreate(osThread(RXExec), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
