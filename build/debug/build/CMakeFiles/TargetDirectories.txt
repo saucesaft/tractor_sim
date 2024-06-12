@@ -1,0 +1,3 @@
+/Users/saucesaft/Developer/STM32/tractor_sim/build/debug/build/CMakeFiles/tractor_sim.dir
+/Users/saucesaft/Developer/STM32/tractor_sim/build/debug/build/CMakeFiles/edit_cache.dir
+/Users/saucesaft/Developer/STM32/tractor_sim/build/debug/build/CMakeFiles/rebuild_cache.dir
