@@ -14,13 +14,13 @@
 
 
 ### TODO
--[ ] ⁠agregar FreeRTOS a nuestro proyecto
--[ ]⁠ hacer todo con tasks (priority scheduler)
--[ ]⁠ activar el RX del serial en la STM
--[ ]⁠ añadir modos a nuestra comunicación
--[ ]⁠ modo 1, que los datos sean con lo que te manda la stm
--[ ]⁠ modo 2, que los datos sean los que mandes a traves de la interfaz web
--[ ]⁠ agregar 2 leds que sean como las direccionales dependiendo del lado
+- [ ] ⁠agregar FreeRTOS a nuestro proyecto
+- [ ] hacer todo con tasks (priority scheduler)
+- [ ] activar el RX del serial en la STM
+- [ ] añadir modos a nuestra comunicación
+- [ ] modo 1, que los datos sean con lo que te manda la stm
+- [ ] modo 2, que los datos sean los que mandes a traves de la interfaz web
+- [ ] agregar 2 leds que sean como las direccionales dependiendo del lado
 
 si tenemos tiempo:
--[ ]⁠ agregar soporte para el joystick (adelante es aceleración) (izquierda, derecha es dirección) (boton es freno)
+- [ ] agregar soporte para el joystick (adelante es aceleración) (izquierda, derecha es dirección) (boton es freno)
