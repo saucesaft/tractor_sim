@@ -158,10 +158,55 @@ void change_mode( void const * argument ) {
 */
 void serial_read( void const * argument ) {
 	for(;;) {
-		queue_data data = { .acceleration = 0x0, .brake = 80, .direction = 0x0, };
+		uint8_t pot_value = USER_USART1_Read_8bit();
+
+		// scales the potentiometer value to the range of acceleration (0 to 100)
+		queue_data data = { .acceleration = pot_value, .brake = 0x0, .direction = 0x0, };
+
 		data.src = 0x0;
 
-		osMessagePut(change_queue, (uint32_t)&data, osWaitForever);
+		while( !( USART1->SR & USART_SR_RXNE )) {
+			osMessagePut(change_queue, (uint32_t)&data, osWaitForever);
+
+			if ( !(ROW2_PIN) ) {
+				for (int i = 0; i < 1000; i++) {
+					USER_TIM4_Delay(); // fake 10ms delay for debounce
+				}
+
+				if ( !(ROW2_PIN) ) {
+					// data.acceleration = 2.0;
+					data.brake = 100.0;
+					data.direction = 3;
+				}
+
+			} else if ( !(ROW1_PIN) ) { // derecha
+				for (int i = 0; i < 1000; i++) {
+					USER_TIM4_Delay(); // fake 10ms delay for debounce
+				}
+
+				if ( !(ROW1_PIN) ) {
+					// data.acceleration = data.acceleration * 0.95;
+					// data.brake = 0.0;
+					data.direction = 1;
+				}
+
+			} else if ( !(ROW3_PIN) ) { // izquierda
+				for (int i = 0; i < 1000; i++) {
+					USER_TIM4_Delay(); // fake 10ms delay for debounce
+				}
+
+				if ( !(ROW3_PIN) ) {
+					// data.acceleration = data.acceleration * 0.95;
+					// data.brake = 0.0;
+					data.direction = 2;
+				}
+
+			} else {
+				// data.acceleration = data.acceleration;
+				// data.brake = 0.0;
+				data.direction = 0;
+			}
+		}
 
 		osDelay(50);
 	}
@@ -392,6 +437,12 @@ void Setup( void const * argument ) {
 
 	GPIOA->CRH	|=	 ( 0x2UL <<  6U )
 				|	 ( 0x1UL <<  4U );
+
+	GPIOA->CRH	&=	~( 0x1UL <<  10U )
+				&	~( 0x2UL <<  8U );
+
+	GPIOA->CRH	|=	 ( 0x1UL <<  10U )
+				|	 ( 0x0UL <<  8U );
 
 	osThreadTerminate(TaskSetup);
 }
