@@ -3,16 +3,12 @@
 
 #include "cmsis_os.h"
 
-// extern osThreadId Task1Init;
-// extern osThreadId Task1Exec;
-// extern osThreadId Task2Init;
-// extern osThreadId Task2Exec;
-// extern osThreadId Task3Init;
-// extern osThreadId Task3Exec;
-// extern osThreadId Task4Init;
-// extern osThreadId Task4Init;
-// extern osThreadId Task5Init;
-// extern osThreadId Task5Init;
+typedef struct {
+    uint16_t acceleration;
+    uint16_t brake;
+    uint16_t direction;
+    uint8_t src;
+} queue_data;
 
 float map(float x, float in_min, float in_max, float out_min, float out_max);
 
@@ -28,7 +24,7 @@ void Setup( void const * argument );
 /* Task method initialization */
 // Task 1 reads the data inputs from the potentiometer values and the keypad
 void TaskRead1_Init( void const * argument );
-void TaskRead1_Execute( void const * argument );
+void read_sensors( void const * argument );
 
 // Task 2 uses values generated in Task 1 to create the data simulating the vehicle
 void TaskCreateData2_Init( void const * argument );
@@ -45,5 +41,8 @@ void TaskSerial4_Execute( void const * argument );
 // Task 5 recieves information from the serial port
 void TaskRX5_Init( void const * argument );
 void TaskRX5_Execute( void const * argument  );
+
+void serial_read( void const * argument );
+void change_mode( void const * argument );
 
 #endif

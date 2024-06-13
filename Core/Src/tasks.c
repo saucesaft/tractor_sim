@@ -9,39 +9,30 @@
 #include "lcd.h"
 #include "EngTrModel.h"
 
-// #include <stdio.h>
+#include <stdbool.h>
+
+bool toggle = false;
+bool ran = false;
+
+bool read_serial_running = false;
+bool read_sensors_running = false;
 
 uint8_t msg[10] = {0xaa, 0xbb, 0xcc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) ); // we substract 1 because we don't send the last byte (the direction/brake)
+uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) );
 
 osThreadId Task1Exec;
 osThreadId Task2Exec;
 osThreadId Task3Exec;
 osThreadId Task4Exec;
 osThreadId Task5Exec;
+osThreadId Task6Exec;
 osThreadId TaskSetup;
 
-// int _write (int file, char *ptr, int len) {
-// 	int idx;
-// 	for (idx = 0; idx < len; idx++) {
-// 		while( !(USART2->SR & USART_SR_TXE) );
-// 		USART2->DR = *ptr++;
-// 	}
-// }
+// mutex to control access to msg variable
+osMutexId msg_mutex;
 
-//// msg to send ////
-// [bytes]:
-// [0] 0xff marks the start of a new message
-// [1] 0xff marks the start of a new message
-// [2] 0xff marks the start of a new message
-// [3] lsb of engine speed
-// [4] msb of engine speed
-// [5] lsb of vehicle speed
-// [6] msb of vehicle speed
-// [7] lsb of gear
-// [8] msb of gear
-// [9] 0x00 signals the action to take (0: nothing, 1: right, 2: left, 3: brake)
-/////////////////////
+// queue to send data between tasks
+osMessageQId change_queue;
 
 void USER_RCC_Init(void){
 	/* System Clock (SYSCLK) configuration for 64 MHz */
@@ -75,7 +66,6 @@ void USER_RCC_Init(void){
 }
 
 void USER_GPIO_Init(void){
-	// Interrupt LED GPIO
 	// clear bits to remove trash values
 	GPIOA->CRL 	&= 	~( 0x3UL << 22U )
 				& 	~( 0x2UL << 20U );
@@ -85,7 +75,11 @@ void USER_GPIO_Init(void){
 }
 
 void defineTasks(void) {
-  /* USER CODE BEGIN RTOS_THREADS */
+	osMessageQDef(q1, 4, uint32_t);
+	change_queue = osMessageCreate(osMessageQ(q1), NULL);
+
+	osMutexDef(msgLock);
+	msg_mutex = osMutexCreate( osMutex(msgLock) );
 
 	osThreadDef(TaskSetup, Setup, osPriorityRealtime, 1, 256);
 	TaskSetup = osThreadCreate(osThread(TaskSetup), NULL);
@@ -93,15 +87,263 @@ void defineTasks(void) {
 	osThreadDef(CreateExec, TaskCreateData2_Execute, osPriorityNormal, 1, 256);
 	Task2Exec = osThreadCreate(osThread(CreateExec), NULL);
 
-	osThreadDef(ReadExec, TaskRead1_Execute, osPriorityNormal, 1, 256);
-	Task1Exec = osThreadCreate(osThread(ReadExec), NULL);
-
 	osThreadDef(LCDExec, TaskLCD3_Execute, osPriorityNormal, 1, 256);
 	Task3Exec = osThreadCreate(osThread(LCDExec), NULL);
 
 	osThreadDef(SerialExec, TaskSerial4_Execute, osPriorityNormal, 1, 256);
 	Task4Exec = osThreadCreate(osThread(SerialExec), NULL);
 
+	osThreadDef(ModeExec, change_mode, osPriorityNormal, 1, 256);
+	Task6Exec = osThreadCreate(osThread(ModeExec), NULL);
+}
+
+void change_mode( void const * argument ) {
+	
+	// PB8
+	GPIOB->CRH &=  ~( 0x3UL << 2U ) & ~( 0x3UL << 0U ); // Clear to CNF and MODE bits
+	GPIOB->CRH |=	( 0x2UL << 2U ); // CNF of PB4: Input with pull-up/pull-down
+	GPIOB->CRH |=	( 0x0UL << 0U ); // MODE of PB4: Input mode (reset state)
+	GPIOB->ODR |=	( 0x1UL <<  8U); // ODR of PB4: Input pull-up
+
+	for(;;) {
+
+		if ( !( GPIOB->IDR & ( 0x1UL << 8U )) && ran ) {
+			
+			GPIOA->ODR ^= ( 0x1UL << 5U );
+
+			if (read_sensors_running) {
+				osThreadTerminate(Task1Exec);
+			}
+			read_sensors_running = false;
+			read_serial_running = true;
+
+			uint16_t msg_quantity = osMessageWaiting( change_queue );
+			for ( int i = 0; i < msg_quantity; i++ ) {
+				osMessageGet(change_queue, osWaitForever);
+			}
+
+			osThreadDef(ReadExec, serial_read, osPriorityNormal, 1, 256);
+			Task5Exec = osThreadCreate(osThread(ReadExec), NULL);
+
+			ran = false;
+		
+		} else if ( ( GPIOB->IDR & ( 0x1UL << 8U )) && !ran ) {
+
+			GPIOA->ODR ^= ( 0x1UL << 5U );
+
+			if (read_serial_running) {
+				osThreadTerminate(Task5Exec);
+			}
+			read_serial_running = false;
+			read_sensors_running = true;
+
+			uint16_t msg_quantity = osMessageWaiting( change_queue );
+			for ( int i = 0; i < msg_quantity; i++ ) {
+				osMessageGet(change_queue, osWaitForever);
+			}
+
+			osThreadDef(SensorsExec, read_sensors, osPriorityNormal, 1, 256);
+			Task1Exec = osThreadCreate(osThread(SensorsExec), NULL);
+
+			ran = true;
+
+		}
+	}
+
+	osDelay(50);
+}
+
+/*
+	reads the value from the raspberry pi's serial TX and queues up the values
+*/
+void serial_read( void const * argument ) {
+	for(;;) {
+		queue_data data = { .acceleration = 0x0, .brake = 80, .direction = 0x0, };
+		data.src = 0x0;
+
+		osMessagePut(change_queue, (uint32_t)&data, osWaitForever);
+
+		osDelay(50);
+	}
+}
+
+/*
+	reads the value from the potentiometer and the keypad and queues up the values
+*/
+void read_sensors( void const * argument ) {
+
+	for(;;) {
+    	// reads the value from the potentiometer
+		uint16_t pot_value = USER_ADC1_Read();
+        
+		// scales the potentiometer value to the range of acceleration (0 to 100)
+		float acceleration = map(pot_value, 50, 4095, 1, 100);
+
+		queue_data send_data = { .acceleration = 0x42, .brake = 0x42, .direction = 0x42, };
+
+        // Key 'B' is pressed and executes brake
+		if ( !(ROW2_PIN) ) {
+
+			for (int i = 0; i < 1000; i++) {
+				USER_TIM4_Delay(); // fake 10ms delay for debounce
+			}
+
+			if ( !(ROW2_PIN) ) {
+				send_data.acceleration = 2.0;
+				send_data.brake = 100.0;
+				send_data.direction = 3;
+			}
+		} else if ( !(ROW1_PIN) ) { // derecha
+
+			for (int i = 0; i < 1000; i++) {
+				USER_TIM4_Delay(); // fake 10ms delay for debounce
+			}
+
+			if ( !(ROW1_PIN) ) {
+				send_data.acceleration = acceleration * 0.95;
+				send_data.brake = 0.0;
+				send_data.direction = 1;
+			}
+
+		} else if ( !(ROW3_PIN) ) { // izquierda
+
+			for (int i = 0; i < 1000; i++) {
+				USER_TIM4_Delay(); // fake 10ms delay for debounce
+			}
+
+			if ( !(ROW3_PIN) ) {
+				send_data.acceleration = acceleration * 0.95;
+				send_data.brake = 0.0;
+				send_data.direction = 2;
+			}
+
+		} else {
+			send_data.acceleration = acceleration;
+			send_data.brake = 0.0;
+			send_data.direction = 0;
+		}
+
+		send_data.src = 0x1;
+
+		osMessagePut(change_queue, (uint32_t)&send_data, osWaitForever);
+
+		osDelay(50);
+	}	
+}
+
+void TaskCreateData2_Execute( void const * argument ){
+
+	// PA6 LED //
+	// clear bits to remove trash values
+	GPIOA->CRL 	&= 	~( 0x3UL << 26U )
+				& 	~( 0x2UL << 24U );
+
+	// set bits to configure
+	GPIOA->CRL	|= ( 0x1UL << 24U ); // output, 10mhz
+
+	// PA7 LED //
+	// clear bits to remove trash values
+	GPIOA->CRL 	&= 	~( 0x3UL << 30U )
+				& 	~( 0x2UL << 28U );
+
+	// set bits to configure
+	GPIOA->CRL	|= ( 0x1UL << 28U ); // output, 10mhz
+
+	// PA8 LED //
+	// clear bits to remove trash values
+	GPIOA->CRH 	&= 	~( 0x3UL << 2U )
+				& 	~( 0x2UL << 0U );
+
+	// set bits to configure
+	GPIOA->CRH	|= ( 0x1UL << 0U ); // output, 10mhz
+
+	for(;;) {
+
+		osEvent evt = osMessageGet(change_queue, osWaitForever);
+		if (evt.status == osEventMessage) {
+			queue_data* data = (queue_data*)evt.value.v;
+			// Now you can access the fields of the struct
+			EngTrModel_U.Throttle = data->acceleration;
+			EngTrModel_U.BrakeTorque = data->brake;
+
+			msg[9] = data->direction;
+		}
+
+		EngTrModel_step();
+
+		// lock mutex (dont modify msg while it is being sent)
+		osMutexWait(msg_mutex, osWaitForever);
+
+		uint16_t e_speed = (uint16_t) EngTrModel_Y.EngineSpeed;
+		uint16_t v_speed = (uint16_t) EngTrModel_Y.VehicleSpeed;
+		uint8_t gear = (uint8_t) EngTrModel_Y.Gear;
+
+		msg[3] = (uint8_t) e_speed & 0xff;
+		msg[4] = (uint8_t) (e_speed >> 8);
+
+
+		msg[5] = (uint8_t) v_speed & 0xff;
+		msg[6] = (uint8_t) (v_speed >> 8);
+
+		msg[7] = (uint8_t) gear & 0xff;
+		msg[8] = (uint8_t) (gear >> 8);
+
+		// release mutex
+		osMutexRelease(msg_mutex);
+	}
+}
+
+void TaskLCD3_Execute( void const * argument ){
+	for(;;) {
+		LCD_Clear();
+		LCD_Set_Cursor(1, 1);
+
+		// lock mutex (dont send msg while it is being modified)
+		osMutexWait(msg_mutex, osWaitForever);
+
+		// show the message on the LCD
+		USER_LCD_Send_Message(msg, msg_length);
+
+		// show direction on LEDs
+		if (msg[9] == 3) {
+			GPIOA->ODR |= ( 0x1UL << 6U );
+			GPIOA->ODR &= ~( 0x1UL << 7U );
+			GPIOA->ODR &= ~( 0x1UL << 8U );
+		} else if (msg[9] == 1) {
+			GPIOA->ODR &= ~( 0x1UL << 6U );
+			GPIOA->ODR &= ~( 0x1UL << 7U );
+			GPIOA->ODR |= ( 0x1UL << 8U );
+		} else if (msg[9] == 2) {
+			GPIOA->ODR &= ~( 0x1UL << 6U );
+			GPIOA->ODR |= ( 0x1UL << 7U );
+			GPIOA->ODR &= ~( 0x1UL << 8U );
+		} else {
+			GPIOA->ODR &= ~( 0x1UL << 6U );
+			GPIOA->ODR &= ~( 0x1UL << 7U );
+			GPIOA->ODR &= ~( 0x1UL << 8U );
+		}
+
+		// release mutex
+		osMutexRelease(msg_mutex);
+
+		osDelay(100);
+	}
+}
+
+void TaskSerial4_Execute( void const * argument ){
+	for(;;) {
+
+		// lock mutex (dont send msg while it is being modified)
+		osMutexWait(msg_mutex, osWaitForever);
+
+		// send the message through the serial port
+		USER_UART_Send_Message(msg, msg_length);
+
+		// release mutex
+		osMutexRelease(msg_mutex);
+
+		osDelay(200);
+	}
 }
 
 float map(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -152,105 +394,4 @@ void Setup( void const * argument ) {
 				|	 ( 0x1UL <<  4U );
 
 	osThreadTerminate(TaskSetup);
-}
-
-/*
-	Reads the value from the potentiometer and the keypad
-*/
-void TaskRead1_Execute( void const * argument ) {
-
-	for(;;) {
-    	// Reads the value from the potentiometer
-		uint16_t pot_value = USER_ADC1_Read();
-        
-		// Scales the potentiometer value to the range of acceleration (0 to 100)
-		float acceleration = map(pot_value, 50, 4095, 1, 100);
-
-        // Key 'B' is pressed and executes brake
-		if ( !(ROW2_PIN) ) {
-
-			for (int i = 0; i < 1000; i++) {
-				USER_TIM4_Delay(); // fake 10ms delay for debounce
-			}
-
-			if ( !(ROW2_PIN) ) {
-				EngTrModel_U.Throttle = 2.0;
-				EngTrModel_U.BrakeTorque = 100.0;
-				msg[10] = (uint8_t) 3;
-			}
-		} else if ( !(ROW1_PIN) ) { // derecha
-
-			for (int i = 0; i < 1000; i++) {
-				USER_TIM4_Delay(); // fake 10ms delay for debounce
-			}
-
-			if ( !(ROW1_PIN) ) {
-				EngTrModel_U.Throttle = acceleration * 0.95;
-				EngTrModel_U.BrakeTorque = 0.0;
-				msg[10] = (uint8_t) 1;
-			}
-
-		} else if ( !(ROW3_PIN) ) { // izquierda
-
-			for (int i = 0; i < 1000; i++) {
-				USER_TIM4_Delay(); // fake 10ms delay for debounce
-			}
-
-			if ( !(ROW3_PIN) ) {
-				EngTrModel_U.Throttle = acceleration * 0.95;
-				EngTrModel_U.BrakeTorque = 0.0;
-				msg[10] = (uint8_t) 2;
-			}
-
-		} else {
-			EngTrModel_U.Throttle = acceleration;
-			EngTrModel_U.BrakeTorque = 0.0;
-			msg[10] = (uint8_t) 0;
-		}
-
-	// osThreadYield();
-	osDelay(500);
-	}	
-}
-
-void TaskCreateData2_Execute( void const * argument ){
-	for(;;) {
-		EngTrModel_step();
-
-		uint16_t e_speed = (uint16_t) EngTrModel_Y.EngineSpeed;
-		uint16_t v_speed = (uint16_t) EngTrModel_Y.VehicleSpeed;
-		uint8_t gear = (uint8_t) EngTrModel_Y.Gear;
-
-		msg[2] = (uint8_t) e_speed & 0xff;
-		msg[3] = (uint8_t) (e_speed >> 8);
-
-
-		msg[5] = (uint8_t) v_speed & 0xff;
-		msg[6] = (uint8_t) (v_speed >> 8);
-
-		msg[8] = (uint8_t) gear & 0xff;
-		msg[9] = (uint8_t) (gear >> 8);
-
-		// osDelay(50);
-	}
-}
-
-void TaskLCD3_Execute( void const * argument ){
-	for(;;) {
-		LCD_Clear();
-		LCD_Set_Cursor(1, 1);
-
-		GPIOA->ODR ^= ( 0x1UL << 5U );					// Toggle the LED
-
-		USER_LCD_Send_Message(msg, msg_length);			// Show the message
-
-		osDelay(200);
-	}
-}
-
-void TaskSerial4_Execute( void const * argument ){
-	for(;;) {
-		USER_UART_Send_Message(msg, msg_length);		// Send the message
-		osDelay(200);
-	}
 }
