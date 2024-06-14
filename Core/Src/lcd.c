@@ -324,14 +324,7 @@ void USER_LCD_Send_Message( uint8_t *msg, uint16_t size ){
 	LCD_Put_Num( (msg[8] << 8) | msg[7] );
 	LCD_Put_Str(" ");
 
-	if (msg[9] == 3) {
-		LCD_Put_Str("brake");
-	}
-	else if (msg[9] == 1) {
-		LCD_Put_Str("right");
-	}
-	else if (msg[9] == 2) {
-		LCD_Put_Str("left");
-	}
+	LCD_Put_Str("a:");
+	LCD_Put_Num( (msg[11] << 8) | msg[10] );
 
 }

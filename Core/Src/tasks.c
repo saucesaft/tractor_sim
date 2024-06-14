@@ -17,7 +17,7 @@ bool ran = false;
 bool read_serial_running = false;
 bool read_sensors_running = false;
 
-uint8_t msg[10] = {0xaa, 0xbb, 0xcc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t msg[12] = {0xaa, 0xbb, 0xcc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t msg_length = ( sizeof(msg) / sizeof(msg[0]) );
 
 osThreadId Task1Exec;
@@ -87,10 +87,10 @@ void defineTasks(void) {
 	osThreadDef(CreateExec, TaskCreateData2_Execute, osPriorityNormal, 1, 256);
 	Task2Exec = osThreadCreate(osThread(CreateExec), NULL);
 
-	osThreadDef(LCDExec, TaskLCD3_Execute, osPriorityNormal, 1, 256);
+	osThreadDef(LCDExec, TaskLCD3_Execute, osPriorityAboveNormal, 1, 256);
 	Task3Exec = osThreadCreate(osThread(LCDExec), NULL);
 
-	osThreadDef(SerialExec, TaskSerial4_Execute, osPriorityNormal, 1, 256);
+	osThreadDef(SerialExec, TaskSerial4_Execute, osPriorityAboveNormal, 1, 256);
 	Task4Exec = osThreadCreate(osThread(SerialExec), NULL);
 
 	osThreadDef(ModeExec, change_mode, osPriorityNormal, 1, 256);
@@ -269,7 +269,7 @@ void read_sensors( void const * argument ) {
 		}
 
 		send_data.src = 0x1;
-
+d
 		osMessagePut(change_queue, (uint32_t)&send_data, osWaitForever);
 
 		osDelay(50);
@@ -312,6 +312,9 @@ void TaskCreateData2_Execute( void const * argument ){
 			EngTrModel_U.BrakeTorque = data->brake;
 
 			msg[9] = data->direction;
+
+			msg[10] = (uint8_t) data->acceleration & 0xFF;
+			msg[11] = (uint8_t) (data->acceleration >> 8);
 		}
 
 		EngTrModel_step();
@@ -332,6 +335,8 @@ void TaskCreateData2_Execute( void const * argument ){
 
 		msg[7] = (uint8_t) gear & 0xff;
 		msg[8] = (uint8_t) (gear >> 8);
+
+		
 
 		// release mutex
 		osMutexRelease(msg_mutex);
